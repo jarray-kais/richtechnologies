@@ -2,9 +2,37 @@ import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/OrderModel.js';
 import { isAdmin, isAuth, isSellerOrAdmin } from '../utils.js';
+import productRouter from './productRoutes.js';
 
 const orderRouter =express.Router()
 
+// Route for users to view their own orders
+orderRouter.get(
+  '/my',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const startIndex = (page - 1) * limit;
+    const orders = await Order.find({ user: req.user._id }).skip(startIndex)
+     .limit(limit);
+    res.send(orders);
+  })
+);
+// Route Admin to view all orders
+orderRouter.get(
+  '/my',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const startIndex = (page - 1) * limit;
+    const orders = await Order.find({}).skip(startIndex)
+     .limit(limit);
+    res.send(orders);
+  })
+);
 
 //router checkout
 orderRouter.post(
@@ -15,20 +43,17 @@ orderRouter.post(
         res.status(400).send({ message: 'Cart is empty' });
       }
     else{
-      const { shippingAddress } = req.body; // Destructure shippingAddress from req.body
-      // Valider les données de la requête
+      const { shippingAddress } = req.body; 
       const { fullName, address, city, postalCode, country } = shippingAddress;
       if (!fullName || !address || !city || !postalCode || !country) {
         res.status(400).send({ message: 'Veuillez fournir une adresse de livraison valide' });
         return;
       }
-       //Vérifier si un vendeur ne peut pas acheter un produit d'autre vendeur
       const sellers = new Set(req.body.orderItems.map(item => item.seller));
       if (sellers.size > 1) {
         res.status(400).send({ message: 'Un vendeur ne peut pas acheter un produit d\'autre vendeur' });
         return;
       }
-        
       // Créer une nouvelle commande
       const order = new Order({
         seller: req.body.orderItems[0].seller,
@@ -50,6 +75,8 @@ orderRouter.post(
     }
   })
 );
+
+
 orderRouter.get(
   '/',
   isAuth,
@@ -69,6 +96,7 @@ orderRouter.get(
     res.send(orders);
   })
 );
+
 // Route to fetch total orders for user
 orderRouter.get('/totalOrders', isAuth, expressAsyncHandler(async (req, res) => {
     const userId = req.user._id;
@@ -85,18 +113,6 @@ orderRouter.get('/completeOrder' , isAuth , expressAsyncHandler(async(req , res)
   res.send(completeOrder)
 }))
 
-orderRouter.get(
-  '/mine',
-  isAuth,
-  expressAsyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 6;
-      const startIndex = (page - 1) * limit;
-    const orders = await Order.find({ user: req.user._id }).skip(startIndex)
-    .limit(limit);
-    res.send(orders);
-  })
-);
 
 
 
@@ -114,6 +130,32 @@ orderRouter.get(
       }
     })
   );
+productRouter.post('/:id,cashpay' , isAuth , expressAsyncHandler(async (req, res)=> {
+  const order = await Order.findById(req.params.id);
+  if (order) {
+    order.isPaid = true;
+    order.paidAt = Date.now();
+    order.isCashPayment = true; 
+    const updatedOrder = await order.save();
+    res.send({ message: 'Order Paid in Cash', order: updatedOrder });
+  } else {
+    res.status(404).send({ message: 'Order Not Found' });
+  }
+}));
+
+// routes for Order update by admin
+orderRouter.put('/:id' , isAuth , isAdmin , expressAsyncHandler(async(req, res)=>{
+  const order = await Order.findById(req.params.id);
+  if (order) {
+    order.isDelivered = req.body.isDelivered || order.isDelivered;
+    order.packaging = req.body.packaging;
+    order.onTheRoadBeforeDelivering = req.body.onTheRoadBeforeDelivering;
+    const updatedOrder = await order.save();
+    res.send({ message: 'Order status updated', order: updatedOrder });
+  } else {
+    res.status(404).send({ message: 'Order Not Found' });
+  }
+}))
 
 //route por modifier shipping-address
 orderRouter.put('/:orderId/shipping', isAuth , expressAsyncHandler(async(req , res)=>{

@@ -6,7 +6,7 @@ import { upload } from "./uploadRouter.js";
 import Product from "../models/ProductModel.js";
 import dotenv from 'dotenv';
 import { Client } from '@elastic/elasticsearch-serverless';
-
+import fs from 'fs';
 dotenv.config()
 
 
@@ -424,7 +424,6 @@ productRouter.put('/:id', isAuth , isSellerOrAdmin , upload.array("image", 5) , 
     // Mettez à jour le tableau d'images avec les nouveaux chemins
     product.image = req.files.map(file => ({ url: file.path }));
   }
-console.log (req.body.name , req.body.price , req.body.mainCategory,req.body.subCategory ,req.body.brand , req.body.description , req.body.description)
   
   const updatedProduct = await product.save();
  
@@ -435,14 +434,27 @@ console.log (req.body.name , req.body.price , req.body.mainCategory,req.body.sub
 
 //delete product
 productRouter.delete(
-  "/:id/admin",
+  "/:id/product",
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (product) {
+      if (product.image && product.image.length > 0) {
+        product.image.forEach((image) => {
+          fs.unlink(image.url, (err) => {
+            if (err) {
+              console.error(`Error deleting ${image.url}:`, err);
+            } else {
+              console.log(`Successfully deleted ${image.url}`);
+            }
+          });
+        });
+      }
+
       const deleteProduct = await product.deleteOne();
       res.send({ message: "Product Deleted", product: deleteProduct });
+
     } else {
       res.status(404).send({ message: "Product Not Found" });
     }
@@ -456,6 +468,18 @@ productRouter.delete(
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (product) {
+      if (product.image && product.image.length > 0) {
+        product.image.forEach((image) => {
+          fs.unlink(image.url, (err) => {
+            if (err) {
+              console.error(`Error deleting ${image.url}:`, err);
+            } else {
+              console.log(`Successfully deleted ${image.url}`);
+            }
+          });
+        });
+      }
+
       const deleteProduct = await product.deleteOne();
       res.send({ message: "Product Deleted", product: deleteProduct });
     } else {

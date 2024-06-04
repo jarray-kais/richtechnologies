@@ -53,11 +53,6 @@ const productSchema = new mongoose.Schema(
         timestamps: true // Ajoute automatiquement les champs createdAt et updatedAt
     }
 );
-productSchema.index({ 'category.main': 1, 'category.sub': 1 });
-
-const Product = mongoose.model('Product', productSchema);
-
-export default Product;
 
 async function syncToElastic(doc, operation) {
   let body;
@@ -88,6 +83,7 @@ async function syncToElastic(doc, operation) {
       await client.delete({
         index: 'ecommerce',
         id: doc._id.toString(),
+        refresh: true
       });
       break;
     default:
@@ -104,9 +100,59 @@ productSchema.post('findOneAndUpdate', function(doc) {
   syncToElastic(doc, 'update');
 });
 
-productSchema.post('findOneAndRemove', function(doc) {
+productSchema.pre('remove', function(next) {
+  this.model('Product').deleteOne({ _id: this._id }, next);
+});
+
+productSchema.post('delete', function(doc, next) {
   syncToElastic(doc, 'delete');
-}); 
+  next();
+});
+
+/* // Mock document
+const mockDoc = {
+  _id: new mongoose.Types.ObjectId(),
+  name: 'Test Product',
+  description: 'This is a test product',
+  category: {
+    main: 'Electronics',
+    sub: 'Gadgets'
+  },
+  brand: 'Test Brand',
+  price: 100,
+  countInStock: 50,
+  rating: 4.5,
+  promotion: {
+    discountedPrice: 80,
+    startDate: new Date(),
+    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week from now
+  }
+};
+const { _id, ...docBody } = mockDoc;
+// Index the document first
+client.index({
+  index: 'ecommerce',
+  id: mockDoc._id.toString(),
+  body: docBody,
+  refresh: true
+}).then(() => {
+  // Call the syncToElastic function with the delete operation
+  syncToElastic(mockDoc, 'delete')
+    .then(() => {
+      console.log('Delete operation completed');
+    })
+    .catch((error) => {
+      console.error('Error during delete operation:', error);
+    });
+}).catch((error) => {
+  console.error('Error during indexing operation:', error);
+}); */
+productSchema.index({ 'category.main': 1, 'category.sub': 1 });
+
+const Product = mongoose.model('Product', productSchema);
+
+export default Product;
+
 
  async function syncData() {
 

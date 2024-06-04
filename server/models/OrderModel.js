@@ -25,6 +25,7 @@ const orderSchema = new mongoose.Schema(
       lng: Number,
     },
     paymentMethod: { type: String, required: true },
+    isCashPayment: { type: Boolean, default: false }, 
     paymentResult: {
       id: String,
       status: String,
