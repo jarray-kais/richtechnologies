@@ -10,15 +10,15 @@ import fs from 'fs';
 dotenv.config()
 
 
- const client = new Client({ node: process.env.URL ,
-  auth: {
-      apiKey : process.env.apiKey
-    },
-}); 
- const productRouter = express.Router();
+const client = new Client({ node: process.env.URL ,
+ auth: {
+     apiKey : process.env.apiKey
+   },
+});
+const productRouter = express.Router();
 
 
-   // check promotions daily at midnight
+// check promotions daily at midnight
 cron.schedule('0 0 * * *', async () => {
   try {
     // Find products with expired promotions
@@ -153,6 +153,18 @@ productRouter.get(
   })
 );
 
+//route to fetch user view history
+productRouter.get('/history', isAuth , expressAsyncHandler(async(req , res)=>{
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 4;
+  const startIndex = (page - 1) * limit;
+  const userId = req.user._id
+  console.log(userId);
+  const history = await Product.find({'viewedProduct.user' : userId})
+  .select('name image rating numReviews viewedProduct').populate('viewedProduct.viewedAt').skip(startIndex).limit(limit)
+  res.send( history)
+}))
+
 //router featured products
 productRouter.get(
   "/featured",
@@ -226,7 +238,7 @@ productRouter.get(
 );
 
 
- //create new product
+//create new product
 productRouter.post(
   "/new",
   isAuth,
@@ -268,7 +280,7 @@ productRouter.get(
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id).populate(
       "seller",
-      "seller.name seller.logo seller.rating seller.numReviews"
+      "seller.nameBrand seller.logo seller.rating seller.numReviews"
     );
     if (product) {
       res.send(product);
@@ -277,6 +289,8 @@ productRouter.get(
     }
   })
 );
+
+
 //product of seller
 productRouter.get(
   "/:id/seller",
@@ -328,6 +342,27 @@ productRouter.get(
       })
     );
 
+// route to save product view
+productRouter.post('/:id/view', isAuth , expressAsyncHandler(async(req , res)=>{
+  const productId = req.params.id 
+  const userId = req.user._id
+ const product = await Product.findById(productId )
+ // console.log(userId)
+  if(!product){
+    res.status(404).send({ message: "Product Not Found" });
+  }else{
+    const viewIndex = product.viewedProduct.findIndex(view=>(view.user.toString() === userId.toString()))
+    if (viewIndex !== -1){
+      product.viewedProduct[viewIndex].viewedAt = Date.now();
+    } else {
+      // Add a new view entry if the user hasn't viewed the product before
+      product.viewedProduct.push({ user: userId, viewedAt: Date.now() });
+    }
+  }
+  await product.save();
+
+    res.status(201).send({ message: 'Product viewed', product });
+}))
 //route promotion
 productRouter.post(
   "/:id/promotion",

@@ -7,6 +7,15 @@ import { Client } from '@elastic/elasticsearch-serverless';
     },
 }); 
  
+
+const viewedProductSchema = new mongoose.Schema({
+  user :{  type: mongoose.Schema.Types.ObjectId,
+            ref: 'User', // Référence au schéma User 
+            required: true
+            },
+  viewedAt: { type: Date, default: Date.now },
+}, { _id : false }); // Disabling the automatic creation of _id for subdocuments
+
 const promotionSchema = mongoose.Schema({
     discountedPrice: { type: Number, required: true }, // Prix réduit pendant la promotion
     startDate: { type: Date, default: Date.now },
@@ -41,6 +50,7 @@ const productSchema = new mongoose.Schema(
           ],
         rating: { type: Number, default: 0 },
         numReviews: { type: Number, default: 0 },
+        viewedProduct : [viewedProductSchema] , 
         reviews: [reviewSchema], // Relation avec le schéma de review
         promotion: promotionSchema ,
         seller: {
@@ -109,44 +119,6 @@ productSchema.post('delete', function(doc, next) {
   next();
 });
 
-/* // Mock document
-const mockDoc = {
-  _id: new mongoose.Types.ObjectId(),
-  name: 'Test Product',
-  description: 'This is a test product',
-  category: {
-    main: 'Electronics',
-    sub: 'Gadgets'
-  },
-  brand: 'Test Brand',
-  price: 100,
-  countInStock: 50,
-  rating: 4.5,
-  promotion: {
-    discountedPrice: 80,
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week from now
-  }
-};
-const { _id, ...docBody } = mockDoc;
-// Index the document first
-client.index({
-  index: 'ecommerce',
-  id: mockDoc._id.toString(),
-  body: docBody,
-  refresh: true
-}).then(() => {
-  // Call the syncToElastic function with the delete operation
-  syncToElastic(mockDoc, 'delete')
-    .then(() => {
-      console.log('Delete operation completed');
-    })
-    .catch((error) => {
-      console.error('Error during delete operation:', error);
-    });
-}).catch((error) => {
-  console.error('Error during indexing operation:', error);
-}); */
 productSchema.index({ 'category.main': 1, 'category.sub': 1 });
 
 const Product = mongoose.model('Product', productSchema);
