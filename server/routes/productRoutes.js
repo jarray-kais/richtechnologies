@@ -161,7 +161,7 @@ productRouter.get('/history', isAuth , expressAsyncHandler(async(req , res)=>{
   const userId = req.user._id
   console.log(userId);
   const history = await Product.find({'viewedProduct.user' : userId})
-  .select('name image rating numReviews viewedProduct').populate('viewedProduct.viewedAt').skip(startIndex).limit(limit)
+  .select('name image rating numReviews viewedProduct').populate({path: 'viewedProduct.user',select: 'viewedAt',}).skip(startIndex).limit(limit)
   res.send( history)
 }))
 

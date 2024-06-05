@@ -1,10 +1,104 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/OrderModel.js';
+import User from '../models/userModel.js';
+import Product from '../models/ProductModel.js';
 import { isAdmin, isAuth, isSellerOrAdmin } from '../utils.js';
 import productRouter from './productRoutes.js';
 
 const orderRouter =express.Router()
+
+orderRouter.get(
+  '/',
+  isAuth,
+  isSellerOrAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const startIndex = (page - 1) * limit;
+    const seller = req.query.seller || '';
+    const sellerFilter = seller ? { seller } : {};
+
+    const orders = await Order.find({ ...sellerFilter }).populate(
+      'user',
+      'name'
+    ).skip(startIndex)
+    .limit(limit);;
+    res.send(orders);
+  })
+);
+
+//Fetches summary data for orders, users, and products.
+orderRouter.get(
+  '/summary',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    // Fetch total orders, total sales, and daily orders
+    const orders = await Order.aggregate([
+      {
+        $group: {
+          _id: null,
+          numOrders: { $sum: 1 },
+          totalSales: { $sum: '$totalPrice' },
+        },
+      },
+    ]);
+    // Fetch total number of users
+    const users = await User.aggregate([
+      {
+        $group: {
+          _id: null,
+          numUsers: { $sum: 1 },
+        },
+      },
+    ]);
+    //Fetch daily orders and sales
+    const dailyOrders = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          orders: { $sum: 1 },
+          sales: { $sum: '$totalPrice' },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+     // Fetch sales by payment method
+    const salesByPaymentMethod = await Order.aggregate([
+      {
+        $group: {
+          _id: '$paymentMethod',
+          totalSales: { $sum: '$totalPrice' },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+  // Fetch number of users by month
+    const usersByMonth = await User.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+     // Fetch product categories
+    const productCategories = await Product.aggregate([
+      {
+        $group: {
+          _id: '$category.main',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    res.send({ users, orders, dailyOrders, productCategories , salesByPaymentMethod , usersByMonth });
+  })
+);
+
 
 // Route for users to view their own orders
 orderRouter.get(
@@ -21,7 +115,7 @@ orderRouter.get(
 );
 // Route Admin to view all orders
 orderRouter.get(
-  '/my',
+  '/AllOrder',
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
@@ -33,6 +127,23 @@ orderRouter.get(
     res.send(orders);
   })
 );
+
+// Route to fetch total orders for user
+orderRouter.get('/totalOrders', isAuth, expressAsyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const totalOrders = await Order.countDocuments({ user: userId });
+    res.json({ totalOrders });
+ 
+})
+);
+
+//Route to fetch complete order 
+orderRouter.get('/completeOrder' , isAuth , expressAsyncHandler(async(req , res)=>{
+  const userId = req.user._id;
+  const completeOrder = await Order.countDocuments({user : userId , isDelivered : true })
+  res.send(completeOrder)
+}))
+
 
 //router checkout
 orderRouter.post(
@@ -77,41 +188,9 @@ orderRouter.post(
 );
 
 
-orderRouter.get(
-  '/',
-  isAuth,
-  isSellerOrAdmin,
-  expressAsyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 6;
-    const startIndex = (page - 1) * limit;
-    const seller = req.query.seller || '';
-    const sellerFilter = seller ? { seller } : {};
 
-    const orders = await Order.find({ ...sellerFilter }).populate(
-      'user',
-      'name'
-    ).skip(startIndex)
-    .limit(limit);;
-    res.send(orders);
-  })
-);
 
-// Route to fetch total orders for user
-orderRouter.get('/totalOrders', isAuth, expressAsyncHandler(async (req, res) => {
-    const userId = req.user._id;
-    const totalOrders = await Order.countDocuments({ user: userId });
-    res.json({ totalOrders });
- 
-})
-);
 
-//Route to fetch complete order 
-orderRouter.get('/completeOrder' , isAuth , expressAsyncHandler(async(req , res)=>{
-  const userId = req.user._id;
-  const completeOrder = await Order.countDocuments({user : userId , isDelivered : true })
-  res.send(completeOrder)
-}))
 
 
 
@@ -130,6 +209,8 @@ orderRouter.get(
       }
     })
   );
+
+//Route cash payments
 productRouter.post('/:id,cashpay' , isAuth , expressAsyncHandler(async (req, res)=> {
   const order = await Order.findById(req.params.id);
   if (order) {
