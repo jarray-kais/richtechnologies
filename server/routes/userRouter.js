@@ -18,9 +18,11 @@ userRouter.get(
   })
 );
 
+
 // routes admin get all users
 userRouter.get(
   '/',
+  
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
