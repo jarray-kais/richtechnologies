@@ -11,7 +11,7 @@ const ResetPassword = () => {
     const [message, setMessage] = useState('')
     const mutation = useMutation({
         mutationFn: resetPassword,
-        onSuccess: (data) => {
+        onSuccess: () => {
             setMessage('Password reset successfully');
             navigate('/signin');
         },
@@ -27,7 +27,7 @@ const ResetPassword = () => {
             setMessage('Passwords do not match')
             return
         }
-        mutation.mutate({token , password})
+        mutation.mutate({password , token})
     }
   return (
  

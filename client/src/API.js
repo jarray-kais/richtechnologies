@@ -27,7 +27,7 @@ export const signIn = async (credentials) => {
     return response.data;
   }
 
-  export const resetPassword = async(password,token)=>{
+  export const resetPassword = async({password,token})=>{
     const response = await axios.post('/api/users/reset-password',{password,token} , 
       {headers: {
         'Content-Type': 'application/json',

@@ -17,7 +17,8 @@ const SigningScreen = () => {
         navigate('/')
         } ,
         onError: (error) => {
-           setMessage({"Error" :  error.message});
+          const errorMessage = error.response?.data?.message || error.message || "An error occurred";
+          setMessage(errorMessage);
           },
       
     } )
@@ -57,7 +58,7 @@ console.log(mutation)
       </button>
       
     </form>
-    {message && <p> {message} </p>}
+    {message && <p style={{ color:'red' }}>{message}</p>}
     <div><Link to={"/forget-password"}>Forgot Your Password</Link></div>
   </div>
   )
