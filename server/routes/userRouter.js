@@ -7,6 +7,7 @@ import User from '../models/userModel.js';
 import { upload } from './uploadRouter.js';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
+import resizeImages from '../Resizes.js';
 
 const userRouter = express.Router();
 userRouter.get(
@@ -58,7 +59,7 @@ userRouter.get(
 
 
 //Signup users Routes
-userRouter.post('/signup',upload.single('profilePicture') , expressAsyncHandler(async (req, res) => {
+userRouter.post('/signup',upload.single('profilePicture') ,resizeImages , expressAsyncHandler(async (req, res) => {
   const { name, email, password, telephone , Country} = req.body;
   const profilePicture = req.file ? req.file.path : null;
   // Check if the user already exists
@@ -83,6 +84,7 @@ userRouter.post('/signup',upload.single('profilePicture') , expressAsyncHandler(
 // Route for seller signup
 userRouter.post('/sellerSignup' , 
 upload.fields([{ name: 'profilePicture'}, { name: 'logo' }]),
+resizeImages ,
  expressAsyncHandler(async (req, res) => {
   const { name, email, password , telephone , sellerName , sellerAdresse, description , Country } = req.body;
   const profilePicture = req.files['profilePicture'][0].path // Chemin de l'image téléchargée
@@ -175,9 +177,9 @@ userRouter.post(
         auth: {
             user: process.env.NODEJS_GMAIL_APP_USER,   // your email address
             pass: process.env.NODEJS_GMAIL_APP_PASSWORD // your password
+           
         },
       }
-      
       let transporter = nodemailer.createTransport(config);
 
       let message = {
@@ -209,11 +211,11 @@ userRouter.post(
   expressAsyncHandler(async (req, res) => {
     jwt.verify(req.headers.token, process.env.JWT_SECRET || 'somethingsecret',async (err, decode) => {
       if (err) {
-        console.log('first')
+       
         res.status(401).send({ message: 'Invalid Token' });
       } else {
         const user = await User.findOne({ resetToken: req.headers.token });
-        console.log( req.headers.token)
+        
         if (user) {
           if (req.body.password) {
             user.password = bcrypt.hashSync(req.body.password, 8);

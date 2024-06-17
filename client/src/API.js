@@ -18,3 +18,21 @@ export const signIn = async (credentials) => {
     });
     return response.data;
   };
+
+  export const forgetPassword = async(email)=>{
+    const response = await axios.post('/api/users/forget-password',email ,
+       {headers: {
+        'Content-Type': 'application/json'
+      }});
+    return response.data;
+  }
+
+  export const resetPassword = async(password,token)=>{
+    const response = await axios.post('/api/users/reset-password',{password,token} , 
+      {headers: {
+        'Content-Type': 'application/json',
+        'token' : token
+      }})
+    
+    return response.data;
+  }

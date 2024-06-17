@@ -1,10 +1,12 @@
 import { useState } from "react"
 import { signUp } from "../API"
 import { useMutation } from "@tanstack/react-query"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const SignupScreen = () => {
   const navigate = useNavigate()
+  const [check , setCheck] = useState(false)
+  const [message, setMessage] = useState('')
   const [formData , setFormData] = useState({
     name: "",
     email: "",
@@ -20,7 +22,8 @@ const SignupScreen = () => {
       navigate('/signin')
     } ,
     onError: (error) => {
-      console.error('Error:', error.response?.data?.message || error.message);
+      const errorMessage = error.response?.data?.message || error.message || "An error occurred";
+      setMessage(errorMessage);
     }
   })
 
@@ -42,12 +45,18 @@ const SignupScreen = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if(formData.password !== formData.confirmPassword){
+      setMessage('Passwords do not match')
+      return
+  }
     mutation.mutate(formData)
   }
 
   return (
     <div>
     <h2>signup</h2>
+
+    <h4>Already Have An Account,  <Link to={"/signin"}>Login</Link></h4>
    
     <form onSubmit={handleSubmit}>
     <div>
@@ -120,10 +129,22 @@ const SignupScreen = () => {
           required
         />
       </div>
-      <button type="submit" disabled={mutation.isLoading}>
+      <div>
+          <label>
+            <input
+              type="checkbox"
+              name="termsAccepted"
+              checked={check}
+              onChange={(e)=>setCheck (e.target.checked)}
+              required
+            /> 
+            I have read and agreed to the <Link to="/terms">Terms</Link> of Service and <Link to="/privacy">  Privacy Policy</Link>
+          </label>
+        </div>
+      <button type="submit" disabled={mutation.isLoading || !check}>
         {mutation.isLoading ? 'Sign Up...' : 'Sign Up'}
       </button>
-      {mutation.isError && <p style={{ color: 'red' }}>{mutation.error.message}</p>}
+      {message && <p style={{ color:'red' }}>{message}</p>}
     </form>
   </div>
   )

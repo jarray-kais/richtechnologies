@@ -9,14 +9,15 @@ const SigningScreen = () => {
   const navigate = useNavigate()
     const [email , setEmail] = useState('')
     const [password, setPassword] = useState('')
-    console.log(signIn)
+    const [message, setMessage] = useState('');
     const mutation = useMutation({ mutationFn: signIn ,
+    
         onSuccess : (data) => {
         Cookies.set('token',  data.token, { expires: 1 } )
         navigate('/')
         } ,
         onError: (error) => {
-            console.error('Error:', error.response?.data?.message || error.message);
+           setMessage({"Error" :  error.message});
           },
       
     } )
@@ -54,8 +55,10 @@ console.log(mutation)
       <button type="submit" disabled={mutation.isLoading}>
         {mutation.isLoading ? 'Signing In...' : 'Sign In'}
       </button>
-      {mutation.isError && <p style={{ color: 'red' }}>{mutation.error.message}</p>}
+      
     </form>
+    {message && <p> {message} </p>}
+    <div><Link to={"/forget-password"}>Forgot Your Password</Link></div>
   </div>
   )
 }
