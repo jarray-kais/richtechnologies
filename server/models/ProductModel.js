@@ -126,7 +126,7 @@ const Product = mongoose.model('Product', productSchema);
 export default Product;
 
 
- async function syncData() {
+/*  async function syncData() {
 
   try {
     const dataset = await Product.find()
@@ -178,3 +178,4 @@ export default Product;
   
   }
   syncData();
+ */
