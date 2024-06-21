@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom"
 
 const SignupScreen = () => {
   const navigate = useNavigate()
+  const [fileName, setFileName] = useState('');
   const [check , setCheck] = useState(false)
   const [message, setMessage] = useState('')
   const [formData , setFormData] = useState({
@@ -51,10 +52,17 @@ const SignupScreen = () => {
   }
     mutation.mutate(formData)
   }
+ 
+
+  const handleChangefile = (event) => {
+    if (event.target.files.length > 0) {
+      setFileName(event.target.files[0].name);
+    }
+  };
 
   return (
     <div>
-     <div className="col1" style={{height : '80px'}}>
+     {/* <div className="col1" style={{height : '80px'}}>
         <div className="logo">
           <Link to="/">
             <img src="/images/logo.svg" alt="logo" />
@@ -85,14 +93,17 @@ const SignupScreen = () => {
             <img src="/images/youtube.svg" alt="youtube" />
           </Link>
         </div>
-      </div>
+      </div> */}
+      <div className="signup">
     <h2>signup</h2>
-    <h4>Already Have An Account,  <Link to={"/signin"}>Login</Link></h4>
-   
+      <div >
+    <p style={{fontSize : "16"}}>Already Have An Account,  <Link style={{color : "#2B2B2B"}} to={"/signin"}>Login</Link></p>
+    </div>
     <form onSubmit={handleSubmit}>
-    <div>
+      <div className="form-group">
           <label>Name:</label>
           <input
+         
             type="text"
             name="name"
             value={formData.name}
@@ -100,7 +111,7 @@ const SignupScreen = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Email:</label>
           <input
             type="email"
@@ -110,7 +121,7 @@ const SignupScreen = () => {
             required
           />
         </div>
-      <div>
+      <div className="form-group">
         <label>Password:</label>
         <input
           type="password"
@@ -120,7 +131,7 @@ const SignupScreen = () => {
           required
         />
       </div>
-      <div>
+      <div className="form-group">
         <label>confirmed Password:</label>
         <input
           type="password"
@@ -130,7 +141,7 @@ const SignupScreen = () => {
           required
         />
       </div>
-      <div>
+      <div className="form-group">
         <label>telephone:</label>
         <input
           type="tel"
@@ -140,7 +151,7 @@ const SignupScreen = () => {
           required
         />
       </div>
-      <div>
+      <div className="form-group">
         <label>country:</label>
         <input
           type="text"
@@ -150,17 +161,26 @@ const SignupScreen = () => {
           required
         />
       </div>
-      <div>
-        <label>photo de profil:</label>
+      <div className="form-group">
+      <label>Photo de profil:</label>
+      <div className="file-input">
         <input
           type="file"
           name="profilePicture"
-           accept="image/*"
-          onChange={handleChange}
+          accept="image/*"
+          onChange={handleChangefile}
           required
+          id="file"
+          className="file"
         />
+        <label htmlFor="file" className="file-label">
+          Choisir un fichier
+        </label>
+        <span className="file-name">{fileName || 'Aucun fichier choisi'}</span>
       </div>
-      <div>
+    </div>
+  
+      <div >
           <label>
             <input
               type="checkbox"
@@ -172,11 +192,23 @@ const SignupScreen = () => {
             I have read and agreed to the <Link to="/terms">Terms</Link> of Service and <Link to="/privacy">  Privacy Policy</Link>
           </label>
         </div>
-      <button type="submit" disabled={mutation.isLoading || !check}>
-        {mutation.isLoading ? 'Sign Up...' : 'Sign Up'}
+      <button type="submit" disabled={mutation.isLoading || !check} className="signin-button">
+        {mutation.isLoading ? 'Create Account...' : 'Create Account'}
       </button>
       {message && <p style={{ color:'red' }}>{message}</p>}
     </form>
+    <div className="signin-with-google signup-with-google">
+    <div>
+        <div className='horizontal'></div>
+          <span>or</span>
+          <div className='horizontal'></div>
+        </div>
+          <button className="google-signin-button">
+            <img src="/images/Google.png" alt="Google" /> Login up with Google
+          </button>
+        </div>
+  </div>
+  
   </div>
   )
 }

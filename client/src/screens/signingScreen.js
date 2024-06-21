@@ -32,7 +32,7 @@ console.log(mutation)
 
   return (
     <div>
-    <div className="col1" style={{height : '80px'}}>
+    {/* <div className="col1" style={{height : '80px'}}>
         <div className="logo">
           <Link to="/">
             <img src="/images/logo.svg" alt="logo" />
@@ -63,7 +63,7 @@ console.log(mutation)
             <img src="/images/youtube.svg" alt="youtube" />
           </Link>
         </div>
-      </div>
+      </div> */}
       <div className="signin-container">
       <div className="signin-left">
         <h2>Sign In</h2>
