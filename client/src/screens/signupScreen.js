@@ -180,18 +180,19 @@ const SignupScreen = () => {
       </div>
     </div>
   
-      <div >
-          <label>
-            <input
-              type="checkbox"
-              name="termsAccepted"
-              checked={check}
-              onChange={(e)=>setCheck (e.target.checked)}
-              required
-            /> 
-            I have read and agreed to the <Link to="/terms">Terms</Link> of Service and <Link to="/privacy">  Privacy Policy</Link>
-          </label>
-        </div>
+    <div className="checkbox-container">
+      <label className="custom-checkbox">
+        <input
+          type="checkbox"
+          name="termsAccepted"
+          checked={check}
+          onChange={(e) => setCheck(e.target.checked)}
+          required
+        />
+        <span className="checkmark"></span>
+        I have read and agreed to the <Link to="/terms" className="link">Terms of Service</Link> and <Link to="/privacy" className="link">Privacy Policy</Link>
+      </label>
+    </div>
       <button type="submit" disabled={mutation.isLoading || !check} className="signin-button">
         {mutation.isLoading ? 'Create Account...' : 'Create Account'}
       </button>
