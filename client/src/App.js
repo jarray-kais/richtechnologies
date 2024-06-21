@@ -6,11 +6,15 @@ import TermsScreen from "./screens/TermsScreen";
 import PrivacyScreen from "./screens/PrivacyScreen";
 import Forgetpassword from "./screens/Forgetpassword";
 import ResetPassword from "./screens/ResetPassword";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
 
 
 function App() {
   return (
     <div> 
+    <Header />
+    <main>
     <Routes>
       <Route path={"/"} element=<HomeScreen /> />
       <Route path={"/signin"} element=<SigningScreen /> />
@@ -21,7 +25,8 @@ function App() {
       <Route path={"/reset-password/:token"} element=<ResetPassword /> />
 
     </Routes>
-      
+      </main>
+      <Footer/>
     </div>
   );
 }

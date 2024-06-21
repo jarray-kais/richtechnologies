@@ -36,3 +36,13 @@ export const signIn = async (credentials) => {
     
     return response.data;
   }
+export const maincategory = async(category)=>{
+  const response = await axios.get('/api/products/maincategories',{category})
+  return response.data;
+}
+export const fetchbrand = async(category)=>{
+  const response = await axios.get(`/api/products/brand/${category}`)
+  return response.data;
+
+
+}

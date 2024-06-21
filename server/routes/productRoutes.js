@@ -202,6 +202,16 @@ productRouter.get(
   })
 );
 
+//Route pour obtenir les main-catégories 
+productRouter.get(
+  "/maincategories",
+  expressAsyncHandler(async (req, res) => {
+    const mainCategories = await Product.distinct("category.main");
+
+    res.send(mainCategories);
+  })
+);
+
 //Route pour obtenir les sous-catégories d'une catégorie spécifique
 productRouter.get(
   "/:mainCategory/subcategories",
@@ -237,6 +247,15 @@ productRouter.get(
   })
 );
 
+//Route pour obtenir les brand de chaque maincategory
+productRouter.get('/brand/:mainCategory', expressAsyncHandler(async(req , res) => {
+  const mainCategory = req.params.mainCategory;
+  const brands = await Product.distinct("brand", {
+    "category.main": mainCategory,
+  });
+  res.send(brands)
+
+}))
 
 //create new product
 productRouter.post(

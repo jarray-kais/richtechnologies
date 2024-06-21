@@ -1,4 +1,4 @@
 - resizes de l'image 
 -review of seller 
 -stripe (verification de payment)
--
+-css media (mobile)
