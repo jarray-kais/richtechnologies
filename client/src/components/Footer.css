@@ -4,6 +4,8 @@
     background-color: #1B6392;
     color: #fff;
     padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
   }
   
   .footer-top {
@@ -17,6 +19,7 @@
   .container{
     display: flex;
     justify-content: space-between;
+    height: 100%;
   }
   .footer-logo img {
     max-width: 300px;

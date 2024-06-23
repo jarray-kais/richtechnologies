@@ -19,6 +19,17 @@ export const signIn = async (credentials) => {
     return response.data;
   };
 
+  export const sellerSignup = async (userData) => {
+    const formData = new FormData();
+    Object.keys(userData).forEach((key) => {
+      formData.append(key, userData[key]);
+    });
+    
+   // const formData = new FormData();
+  const response = await axios.post('/api/users/sellerSignup', formData)
+    return response.data;
+  }
+
   export const forgetPassword = async(email)=>{
     const response = await axios.post('/api/users/forget-password',email ,
        {headers: {

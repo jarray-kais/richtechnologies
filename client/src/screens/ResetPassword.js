@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { resetPassword } from "../API";
 import { useNavigate, useParams } from "react-router-dom";
+import Loading from "../components/LoadingOverlay";
 
 const ResetPassword = () => {
     const navigate = useNavigate()
@@ -9,15 +10,18 @@ const ResetPassword = () => {
     const [password, setPassword] = useState('')
     const [confirmedpassword, setConfirmedPassword] = useState('')
     const [message, setMessage] = useState('')
+    const [isLoading, setIsLoading] = useState(false);
     const mutation = useMutation({
         mutationFn: resetPassword,
         onSuccess: () => {
             setMessage('Password reset successfully');
             navigate('/signin');
+            setIsLoading(false)
         },
         onError: (error) => {
             const errorMessage = error.response?.data?.message || error.message || "An error occurred";
             setMessage(errorMessage);
+            setIsLoading(false)
         }
     })
 
@@ -25,18 +29,19 @@ const ResetPassword = () => {
         e.preventDefault()
         if(password !== confirmedpassword){
             setMessage('Passwords do not match')
+            setIsLoading(true)
             return
         }
         mutation.mutate({password , token})
     }
   return (
  
-    <div>   
+    <div className="Forget">   
     <h2>forgot Password</h2>
     <p>Create a new password. Ensure it differs from
     previous ones for security</p>
     <form onSubmit={handleSubmit}>
-    <div>
+    <div className="form-group">
         <label>Password:</label>
         <input
           type="password"
@@ -46,7 +51,7 @@ const ResetPassword = () => {
           required
         />
       </div>
-      <div>
+      <div className="form-group">
         <label>confirmed Password:</label>
         <input
           type="password"
@@ -56,8 +61,11 @@ const ResetPassword = () => {
           required
         />
       </div>
-      <button type="submit">update  password</button>
+      <button type="submit" disabled={mutation.isLoading} className="signin-button">
+        {mutation.isLoading ? 'Update Password...' : 'Update Password'}
+      </button>
       </form>
+      <Loading overlay={isLoading} />
       {message && <p style={{ color:'red' }}>{message}</p>}
     </div>
   )

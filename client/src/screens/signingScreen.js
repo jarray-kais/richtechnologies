@@ -3,7 +3,6 @@ import { useState } from "react";
 import { signIn } from "../API";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import Footer from "../components/Footer";
 
 
 
@@ -12,6 +11,7 @@ const SigningScreen = () => {
     const [email , setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('');
+
     const mutation = useMutation({ mutationFn: signIn ,
     
         onSuccess : (data) => {
@@ -32,38 +32,7 @@ console.log(mutation)
 
   return (
     <div>
-    {/* <div className="col1" style={{height : '80px'}}>
-        <div className="logo">
-          <Link to="/">
-            <img src="/images/logo.svg" alt="logo" />
-          </Link>
-        </div>
-        <div className="nav-links">
-          <Link to="/">Home</Link>
-          <Link to="/orders">Orders</Link>
-          <Link to="/track-order">Track Order</Link>
-          <Link to="/customer-support">Customer Support</Link>
-          <Link to="/need-help">Need Help</Link>
-        </div>
-        <div className="become-seller">
-          <Link to="/become-seller">Become a Seller</Link>
-        </div>
-        <div className="follow-us">
-          <span>Follow us:</span>
-          <Link to="https://facebook.com">
-            <img src="/images/facebook.svg" alt="facebook" />
-          </Link>
-          <Link to="https://twitter.com">
-            <img src="/images/Twitter.svg" alt="twitter" />
-          </Link>
-          <Link to="https://instagram.com">
-            <img src="/images/instagram.svg" alt="instagram" />
-          </Link>
-          <Link to="https://youtube.com">
-            <img src="/images/youtube.svg" alt="youtube" />
-          </Link>
-        </div>
-      </div> */}
+    
       <div className="signin-container">
       <div className="signin-left">
         <h2>Sign In</h2>
@@ -96,8 +65,9 @@ console.log(mutation)
           <button type="submit" disabled={mutation.isLoading} className="signin-button">
             {mutation.isLoading ? 'Signing In...' : 'Sign In'}
           </button>
+            {message && <p className="error-message">{message}</p>}
         </form>
-        {message && <p className="error-message">{message}</p>}
+      
         <div className="center">
         <div>
           <Link to="/forget-password">Forgot Your Password</Link>
@@ -114,7 +84,7 @@ console.log(mutation)
         <img src="/images/signin.jpg" alt="Sign In" className="signin-right"/>
       </div>
     </div>^
-    <Footer />
+    
   </div>
   )
 }
