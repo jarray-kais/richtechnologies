@@ -10,7 +10,7 @@ const Header = () => {
       <div className="col1">
         <div className="logo">
           <Link to="/">
-            <img src="/images/logo.svg" alt="logo" />
+            <img src="/images/logo.svg" alt="logo"  style={{height : "80px"}}/>
           </Link>
         </div>
         <div className="nav-links">

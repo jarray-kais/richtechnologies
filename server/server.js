@@ -15,6 +15,7 @@ import SupportRouter from './routes/SupportRouter.js';
 import Conversation from './models/Support.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { isAdmin, isAuth, isSellerOrAdmin } from './utils.js';
 
 
 
@@ -48,6 +49,16 @@ app.use('/api', FlouciRouter)
 app.use('/api/stripe',stripeRouter)
 app.use('/api/support',SupportRouter)
 
+
+app.get('/api/check-auth', isAuth, (req, res) => {
+    res.json({ authenticated: true, message: 'User is authenticated' });
+  });
+app.get('/api/check-admin',isAuth , isAdmin, (req, res) => {
+    res.json({ authenticated: true, message: 'User admin is authenticated' });
+  });
+  app.get('/api/check-selleOradmin',isAuth , isSellerOrAdmin, (req, res) => {
+    res.json({ authenticated: true, message: 'User has access' });
+  });
 
 app.get('/api/config/paypal', (req, res) => {
     res.send(process.env.PAYPAL_CLIENT_ID || 'sb');

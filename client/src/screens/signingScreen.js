@@ -16,7 +16,9 @@ const SigningScreen = () => {
     
         onSuccess : (data) => {
         Cookies.set('token',  data.token, { expires: 1 } )
+        console.log(data)
         navigate('/')
+        
         } ,
         onError: (error) => {
           const errorMessage = error.response?.data?.message || error.message || "An error occurred";
@@ -24,12 +26,10 @@ const SigningScreen = () => {
           },
       
     } )
-console.log(mutation)
     const handleSubmit = (e) => {
         e.preventDefault()
         mutation.mutate({email, password})
     }
-
   return (
     <div>
     
