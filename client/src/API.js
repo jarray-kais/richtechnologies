@@ -73,6 +73,10 @@ export const maincategory = async(category)=>{
 export const fetchbrand = async(category)=>{
   const response = await axios.get(`/api/products/brand/${category}`)
   return response.data;
+}
 
-
+//Route edit Profile
+export const editProfile = async(user)=>{
+  const response = await axios.put('/api/users/profile',user)
+    return response.data
 }

@@ -260,7 +260,7 @@ userRouter.put(
         email: updatedUser.email,
         profilePicture : updatedUser.profilePicture,
         telephone :updatedUser.telephone,
-        isAdmin: updatedUser.isAdmin,
+        isAdmin: user.isAdmin,
         isSeller: user.isSeller,
         token: generateToken(updatedUser),
       });

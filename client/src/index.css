@@ -59,7 +59,7 @@
   width: 90%;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 50px;
 }
 
 .signin-button {
@@ -287,4 +287,19 @@
   padding-bottom: 50px;
   height: 100%;
 
+}
+
+/* profile screen --------------------------------------------------------*/
+.flexProfile{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.form-input{
+  width: 100%;
+}
+.change{
+  font-family: "Oxygen", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
