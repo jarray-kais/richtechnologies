@@ -80,3 +80,13 @@ export const editProfile = async(user)=>{
   const response = await axios.put('/api/users/profile',user)
     return response.data
 }
+
+
+//Route get featured products --------------------------------
+
+export const featuredproduct = async(page)=>{
+  const response = await axios.get(`/api/products/featured?page=${page}`)
+ 
+  return response.data;
+ 
+}
