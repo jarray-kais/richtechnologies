@@ -293,7 +293,7 @@ productRouter.post(
     res.status(201).json(createdProduct);
   })
 );
-//find product par id
+//find product by id
 productRouter.get(
   "/:id",
   expressAsyncHandler(async (req, res) => {

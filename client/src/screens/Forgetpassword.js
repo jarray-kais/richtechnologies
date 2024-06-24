@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { forgetPassword } from "../API";
 import { useMutation } from "@tanstack/react-query";
-import Loading from "../components/LoadingOverlay";
-import SuccessMessage from "../components/SuccessMessage";
-import BackButton from "../components/BackButton";
+import Loading from "../components/Loading/LoadingOverlay";
+import SuccessMessage from "../components/successMessage/SuccessMessage";
+import BackButton from "../components/BackButton/BackButton";
 
 const Forgetpassword = () => {
   const [email, setEmail] = useState("");

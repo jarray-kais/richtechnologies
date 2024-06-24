@@ -1,5 +1,5 @@
-import FeaturedProducts from "../components/FeaturedProducts"
-import ImageCarousel from "../components/ImageCarousel"
+import FeaturedProducts from "../components/featuredProduct/FeaturedProducts"
+import ImageCarousel from "../components/ImageCarousel/ImageCarousel"
 
 
 const HomeScreen = () => {

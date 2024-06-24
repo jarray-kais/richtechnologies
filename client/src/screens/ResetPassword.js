@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { resetPassword } from "../API";
 import { useNavigate, useParams } from "react-router-dom";
-import Loading from "../components/LoadingOverlay";
+import Loading from "../components/Loading/LoadingOverlay";
 
 const ResetPassword = () => {
     const navigate = useNavigate()
