@@ -1,12 +1,11 @@
 import mongoose from 'mongoose';
-import { Client } from '@elastic/elasticsearch-serverless';
 
- const client = new Client({ node: process.env.URL ,
+/*  const client = new Client({ node: process.env.URL ,
   auth: {
       apiKey : process.env.apiKey
     },
-}); 
- 
+});  */
+
 
 const viewedProductSchema = new mongoose.Schema({
   user :{  type: mongoose.Schema.Types.ObjectId,
@@ -64,7 +63,7 @@ const productSchema = new mongoose.Schema(
     }
 );
 
-async function syncToElastic(doc, operation) {
+/* async function syncToElastic(doc, operation) {
   let body;
   switch (operation) {
     case 'insert':
@@ -102,8 +101,8 @@ async function syncToElastic(doc, operation) {
 }
 
 // Add Mongoose hooks for save, update, and delete operations
- productSchema.post('save', function(doc) {
-  syncToElastic(doc, 'insert');
+productSchema.post('save', function(doc) {
+ syncToElastic(doc, 'insert');
 });
 
 productSchema.post('findOneAndUpdate', function(doc) {
@@ -117,7 +116,7 @@ productSchema.pre('remove', function(next) {
 productSchema.post('delete', function(doc, next) {
   syncToElastic(doc, 'delete');
   next();
-});
+}); */
 
 productSchema.index({ 'category.main': 1, 'category.sub': 1 });
 

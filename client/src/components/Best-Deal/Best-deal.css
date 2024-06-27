@@ -1,0 +1,27 @@
+@import url("https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+.main-deal {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+.title-deal {
+  display: flex;
+  align-items: center;
+}
+.deal-text {
+  font-family: "Public Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: bold;
+  font-size: 1.5em;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.countdown {
+  background-color: yellow;
+  padding: 5px;
+  margin-left: 10px;
+  font-size: 1.5em;
+  font-weight: bold;
+}

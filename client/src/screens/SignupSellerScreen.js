@@ -20,7 +20,7 @@ const SignupSellerScreen = () => {
     profilePicture: null,
     isSeller: true,
     isAdmin: false,
-    nameBrand: "",
+    sellerName: "",
     sellerAdresse: "",
     logo: null,
     description: "",
@@ -134,8 +134,8 @@ const SignupSellerScreen = () => {
             <label>Name of Brand:</label>
             <input
               type="text"
-              name="nameBrand"
-              value={formData.nameBrand}
+              name="sellerName"
+              value={formData.sellerName}
               onChange={handleChange}
               required
             />

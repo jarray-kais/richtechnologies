@@ -1,3 +1,4 @@
+import Bestdeal from "../components/Best-Deal/Bestdeal"
 import FeaturedProducts from "../components/featuredProduct/FeaturedProducts"
 import ImageCarousel from "../components/ImageCarousel/ImageCarousel"
 
@@ -7,6 +8,7 @@ const HomeScreen = () => {
     <div className="home">
      <ImageCarousel />
      <FeaturedProducts />
+     <Bestdeal/>
     </div>
     
   )

@@ -3,14 +3,14 @@
 .back-button {
     display: flex;
     align-items: center;
-    padding: 10px 20px;
+    padding: 0.6rem 1.25rem;
     background-color: #ECECEC;
     color: #1E1E1E;
     border: none;
-    border-radius: 5px;
+    border-radius: 0.3rem;
     cursor: pointer;
-    font-size: 16px;
-    margin-top: 15px;
+    font-size: 1rem;
+    margin-top: 1rem;
   }
   
 .back-button:hover {
@@ -18,7 +18,7 @@
   }
   
   .back-icon {
-    width: 24px; 
-    height: 24px;
+    width: 1.5rem; 
+    height: 1.5rem;
    
   }

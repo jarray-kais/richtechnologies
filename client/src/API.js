@@ -84,8 +84,8 @@ export const editProfile = async(user)=>{
 
 //Route get featured products --------------------------------
 
-export const featuredproduct = async(page)=>{
-  const response = await axios.get(`/api/products/featured?page=${page}`)
+export const featuredproduct = async(page , limit)=>{
+  const response = await axios.get(`/api/products/featured?page=${page}&limit=${limit}`)
  
   return response.data;
  

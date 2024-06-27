@@ -20,15 +20,15 @@
   }
   
   .logo {
-    margin-right: 20px;
-    width: 80px;
+    margin-right: 1.25rem;
+    width: 5rem;
   }
   
   .nav-links {
    left: 0;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1.25rem;
     color: white;
     
   }
@@ -60,7 +60,7 @@
   .follow-us {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0.675rem;
   }
   
   .follow-us a {
@@ -88,7 +88,7 @@
     padding-left: 5%;
     height: 50%;
     border: 1px solid black;
-    gap: 200px; 
+    gap: 12,5rem; 
   }
   
 
@@ -96,7 +96,7 @@
 .all-categories {
   position: relative;
   display: inline-block;
-  margin-right: 20px;
+  margin-right: 1.25rem;
 }
 
 .dd-button {
@@ -104,12 +104,12 @@
   color: rgb(15, 15, 15);
   border: 1px solid #ccc;
   border-radius: 5px;
-  padding: 10px;
+  padding: 0.675rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 150px;
+  width: 9,375rem;
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -148,7 +148,7 @@
 .category-item {
   display: flex;
   align-items: center;
-  height: 36px;
+  height: 2.25rem;
   padding: 10px 15px;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;

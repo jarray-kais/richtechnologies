@@ -170,10 +170,9 @@ productRouter.get(
   "/featured",
   expressAsyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 4;
+    const limit = parseInt(req.query.limit);
     const startIndex = (page - 1) * limit;
-    const featuredProducts = await Product.find()
-      .sort({ rating: -1 })
+    const featuredProducts = await Product.find({ rating : 5 }).populate('seller', 'seller.nameBrand')
       .skip(startIndex)
       .limit(limit);
     res.send(featuredProducts);
@@ -297,15 +296,17 @@ productRouter.post(
 productRouter.get(
   "/:id",
   expressAsyncHandler(async (req, res) => {
+    console.log('req.user:', req.user);
     const product = await Product.findById(req.params.id).populate(
       "seller",
       "seller.nameBrand seller.logo seller.rating seller.numReviews"
     );
-    if (product) {
-      res.send(product);
-    } else {
-      res.status(404).send({ message: "Product Not Found" });
+    if (!product) {
+      return res.status(404).send({ message: "Product Not Found" });
     }
+    
+    res.send(product);
+
   })
 );
 
@@ -352,7 +353,6 @@ productRouter.get(
         if (product) {
           const page = parseInt(req.query.page) || 1;
           const limit = parseInt(req.query.limit) || 4;
-
           const similarProducts = await findSimilarProducts(product, page, limit);
           res.send(similarProducts);
         } else {
