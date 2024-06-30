@@ -90,3 +90,14 @@ export const featuredproduct = async(page , limit)=>{
   return response.data;
  
 }
+
+//Route get deal products --------------------------------
+export const getdeals = async(page , limit)=>{
+  const response = await axios.get(`/api/products/deal?page=${page}&limit=${limit}`)
+ 
+  return response.data;
+}
+export const getdeal5stars = async(page , limit)=>{
+  const response = await axios.get(`/api/products/deal5stars?page=${page}&limit=${limit}`)
+  return response.data;
+}

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Product = (props) => {
   const { product } = props;
-  console.log(product);
+  
 
   return (
     <div className="card" key={product._id}>
@@ -21,10 +21,10 @@ const Product = (props) => {
         <div className="row">
         <div className="price-section">
         {product.oldPrice ?( 
-        <span className="old-price">${product.oldPrice}</span>)
+        <span className="old-price">{product.oldPrice} TND</span>)
          : null}
             
-            <span className="price">${product.price}</span>
+            <span className="price">{product.price} TND</span>
           </div>
           </div>
           </div>

@@ -5,12 +5,17 @@
  .featured {
   
   margin: 0 auto;
-  text-align: center;
+ 
   padding: 30px;
 }
 
 .featured-title {
-  margin-bottom: 20px;
+ 
+  font-family: "Public Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: bold;
+  font-size: 1.5rem;
+
 }
 
 .swiper-button-next,
@@ -96,7 +101,7 @@
 
 .old-price {
   font-size: 1rem;
-  color: #767676;
+  color: #EE5858;
   text-decoration: line-through;
   margin-right: 0.5rem;
 }

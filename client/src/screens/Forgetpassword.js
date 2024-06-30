@@ -2,7 +2,7 @@ import { useState } from "react";
 import { forgetPassword } from "../API";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../components/Loading/LoadingOverlay";
-import SuccessMessage from "../components/successMessage/SuccessMessage";
+import Message from "../components/Message/Message";
 import BackButton from "../components/BackButton/BackButton";
 
 const Forgetpassword = () => {
@@ -52,7 +52,7 @@ const Forgetpassword = () => {
         {mutation.isLoading ? 'Reset Password...' : 'Reset Password'}
       </button>
       <Loading overlay={isLoading} />
-      {isSuccess && <SuccessMessage message="Email sent successfully" />}
+      {isSuccess && <Message variant="success">Email sent successfully</Message>}
       {message && <p style={{ color:'red' }}>{message}</p>}
       </form>
     </div>

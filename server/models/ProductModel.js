@@ -9,16 +9,16 @@ import mongoose from 'mongoose';
 
 const viewedProductSchema = new mongoose.Schema({
   user :{  type: mongoose.Schema.Types.ObjectId,
-            ref: 'User', // Référence au schéma User 
+            ref: 'User', 
             required: true
             },
   viewedAt: { type: Date, default: Date.now },
-}, { _id : false }); // Disabling the automatic creation of _id for subdocuments
+}, { _id : false }); 
 
 const promotionSchema = mongoose.Schema({
-    discountedPrice: { type: Number, required: true }, // Prix réduit pendant la promotion
+    discountedPrice: { type: Number, required: true }, 
     startDate: { type: Date, default: Date.now },
-    endDate: { type: Date, required: true }, // Date de fin de la promotion
+    endDate: { type: Date, required: true }, 
 });
 const reviewSchema = mongoose.Schema(
     {
@@ -27,7 +27,7 @@ const reviewSchema = mongoose.Schema(
         rating: { type: Number, required: true },
     },
     {
-        timestamps: true // Ajoute automatiquement les champs createdAt et updatedAt
+        timestamps: true 
     }
 );
 
@@ -50,16 +50,16 @@ const productSchema = new mongoose.Schema(
         rating: { type: Number, default: 0 },
         numReviews: { type: Number, default: 0 },
         viewedProduct : [viewedProductSchema] , 
-        reviews: [reviewSchema], // Relation avec le schéma de review
+        reviews: [reviewSchema], 
         promotion: promotionSchema ,
         seller: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User', // Référence au schéma User pour le vendeur
+            ref: 'User', 
             required: true
         }
     },
     {
-        timestamps: true // Ajoute automatiquement les champs createdAt et updatedAt
+        timestamps: true 
     }
 );
 

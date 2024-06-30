@@ -4,66 +4,75 @@ import cron from "node-cron";
 import { isAdmin, isAuth, isSellerOrAdmin } from "../utils.js";
 import { upload } from "./uploadRouter.js";
 import Product from "../models/ProductModel.js";
-import dotenv from 'dotenv';
-import { Client } from '@elastic/elasticsearch-serverless';
-import fs from 'fs';
-dotenv.config()
+import dotenv from "dotenv";
+import { Client } from "@elastic/elasticsearch-serverless";
+import fs from "fs";
+dotenv.config();
 
-
-const client = new Client({ node: process.env.URL ,
- auth: {
-     apiKey : process.env.apiKey
-   },
+const client = new Client({
+  node: process.env.URL,
+  auth: {
+    apiKey: process.env.apiKey,
+  },
 });
 const productRouter = express.Router();
 
-
 // check promotions daily at midnight
-cron.schedule('0 0 * * *', async () => {
+cron.schedule("0 0 * * *", async () => {
   try {
     // Find products with expired promotions
     const products = await Product.find({
-      'promotion.endDate': { $lt: new Date() },
+      "promotion.endDate": { $lt: new Date() },
     });
 
     // If there are no products to update, return early
     if (products.length === 0) {
-      console.log('No promotions to update.');
+      console.log("No promotions to update.");
       return;
     }
 
     // Prepare bulk operations
-    const bulkOps = products.map(product => ({
+    const bulkOps = products.map((product) => ({
       updateOne: {
         filter: { _id: product._id },
-        update: { $unset: { promotion: '' } }
-      }
+        update: { $unset: { promotion: "" } },
+      },
     }));
 
     // Perform bulk update
     const result = await Product.bulkWrite(bulkOps);
 
-    console.log(`Checked promotions. Updated ${result.modifiedCount} products.`);
+    console.log(
+      `Checked promotions. Updated ${result.modifiedCount} products.`
+    );
   } catch (error) {
-    console.error('Error checking promotions:', error);
+    console.error("Error checking promotions:", error);
   }
 });
 
 //Route of search
 productRouter.get(
-  '/search',
+  "/search",
   isAuth,
   expressAsyncHandler(async (req, res) => {
-    const { query, category, brand, minPrice, maxPrice , page = 1, pageSize = 9} = req.query;
+    const {
+      query,
+      category,
+      brand,
+      minPrice,
+      maxPrice,
+      page = 1,
+      pageSize = 9,
+    } = req.query;
 
     if (!query) {
-      res.status(400).send({ message: 'Query parameter is required' });
+      res.status(400).send({ message: "Query parameter is required" });
       return;
     }
     const from = (page - 1) * pageSize; // Calculate the starting index
     try {
       const searchParams = {
-        index: 'ecommerce',
+        index: "ecommerce",
         body: {
           query: {
             bool: {
@@ -72,44 +81,44 @@ productRouter.get(
                   multi_match: {
                     query: query,
                     fields: [
-                      'name^3', // Boost the name field
-                      'description',
-                      'brand^2', // Boost the brand field
-                      'category.main',
-                      'category.sub'
+                      "name^3", // Boost the name field
+                      "description",
+                      "brand^2", // Boost the brand field
+                      "category.main",
+                      "category.sub",
                     ],
-                    fuzziness: 'AUTO', // Allow typos
-                  }
-                }
+                    fuzziness: "AUTO", // Allow typos
+                  },
+                },
               ],
-              filter: []
-            }
+              filter: [],
+            },
           },
           highlight: {
             fields: {
               name: {},
               description: {},
               brand: {},
-              'category.main': {},
-              'category.sub': {}
-            }
+              "category.main": {},
+              "category.sub": {},
+            },
           },
           from: from, // Pagination start
-          size: parseInt(pageSize) // Number of results per page
-        }
+          size: parseInt(pageSize), // Number of results per page
+        },
       };
 
       // Adding category filter if provided
       if (category) {
         searchParams.body.query.bool.filter.push({
-          term: { 'category.main': category }
+          term: { "category.main": category },
         });
       }
 
       // Adding brand filter if provided
       if (brand) {
         searchParams.body.query.bool.filter.push({
-          term: { brand: brand }
+          term: { brand: brand },
         });
       }
 
@@ -119,51 +128,58 @@ productRouter.get(
         if (minPrice) priceFilter.gte = minPrice;
         if (maxPrice) priceFilter.lte = maxPrice;
         searchParams.body.query.bool.filter.push({
-          range: { price: priceFilter }
+          range: { price: priceFilter },
         });
       }
 
       const searchResult = await client.search(searchParams);
       const hits = searchResult.hits.hits;
-      const ids = hits.map(hit => hit._id);
+      const ids = hits.map((hit) => hit._id);
       const products = await Product.find({ _id: { $in: ids } });
       //accéder rapidement aux documents par leur identifiant
-    const productMap = {};
-    products.forEach(product => {
-      productMap[product._id] = product;
-    });
-    
-      const searchResultsWithFullDocuments = hits.map(hit => {
-      const productId = hit._id;
-      const fullDocument = productMap[productId];
-      return {
-        ...hit,
-        fullDocument
-      };
-    });
+      const productMap = {};
+      products.forEach((product) => {
+        productMap[product._id] = product;
+      });
+
+      const searchResultsWithFullDocuments = hits.map((hit) => {
+        const productId = hit._id;
+        const fullDocument = productMap[productId];
+        return {
+          ...hit,
+          fullDocument,
+        };
+      });
       res.send({
-        results: searchResultsWithFullDocuments ,
-        page: parseInt(page), 
-        pageSize: parseInt(pageSize) 
+        results: searchResultsWithFullDocuments,
+        page: parseInt(page),
+        pageSize: parseInt(pageSize),
       });
     } catch (error) {
       console.error(error);
-      res.status(500).send({ message: 'Error searching products' });
+      res.status(500).send({ message: "Error searching products" });
     }
   })
 );
 
 //route to fetch user view history
-productRouter.get('/history', isAuth , expressAsyncHandler(async(req , res)=>{
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 4;
-  const startIndex = (page - 1) * limit;
-  const userId = req.user._id
-  console.log(userId);
-  const history = await Product.find({'viewedProduct.user' : userId})
-  .select('name image rating numReviews viewedProduct').populate({path: 'viewedProduct.user',select: 'viewedAt',}).skip(startIndex).limit(limit)
-  res.send( history)
-}))
+productRouter.get(
+  "/history",
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 4;
+    const startIndex = (page - 1) * limit;
+    const userId = req.user._id;
+    console.log(userId);
+    const history = await Product.find({ "viewedProduct.user": userId })
+      .select("name image rating numReviews viewedProduct")
+      .populate({ path: "viewedProduct.user", select: "viewedAt" })
+      .skip(startIndex)
+      .limit(limit);
+    res.send(history);
+  })
+);
 
 //router featured products
 productRouter.get(
@@ -172,10 +188,43 @@ productRouter.get(
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit);
     const startIndex = (page - 1) * limit;
-    const featuredProducts = await Product.find({ rating : 5 }).populate('seller', 'seller.nameBrand')
+    const featuredProducts = await Product.find({ rating: 5 })
+      .populate("seller", "seller.nameBrand")
       .skip(startIndex)
       .limit(limit);
     res.send(featuredProducts);
+  })
+);
+
+//route find deal products
+productRouter.get(
+  "/deal",
+  expressAsyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit);
+    const startIndex = (page - 1) * limit;
+    const dealProducts = await Product.find({
+      "promotion.endDate": { $gt: new Date() },
+    })
+      .populate("promotion", "promotion.discountedPrice  promotion.endDate")
+      .skip(startIndex)
+      .limit(limit);
+    res.send(dealProducts);
+  })
+);
+productRouter.get(
+  "/deal5stars",
+  expressAsyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit);
+    const startIndex = (page - 1) * limit;
+    const dealProducts = await Product.find({
+      "promotion.endDate": { $gt: new Date() },
+      rating: 5,
+    })
+      .skip(startIndex)
+      .limit(limit);
+    res.send(dealProducts);
   })
 );
 
@@ -201,7 +250,7 @@ productRouter.get(
   })
 );
 
-//Route pour obtenir les main-catégories 
+//Route pour obtenir les main-catégories
 productRouter.get(
   "/maincategories",
   expressAsyncHandler(async (req, res) => {
@@ -247,14 +296,16 @@ productRouter.get(
 );
 
 //Route pour obtenir les brand de chaque maincategory
-productRouter.get('/brand/:mainCategory', expressAsyncHandler(async(req , res) => {
-  const mainCategory = req.params.mainCategory;
-  const brands = await Product.distinct("brand", {
-    "category.main": mainCategory,
-  });
-  res.send(brands)
-
-}))
+productRouter.get(
+  "/brand/:mainCategory",
+  expressAsyncHandler(async (req, res) => {
+    const mainCategory = req.params.mainCategory;
+    const brands = await Product.distinct("brand", {
+      "category.main": mainCategory,
+    });
+    res.send(brands);
+  })
+);
 
 //create new product
 productRouter.post(
@@ -296,7 +347,7 @@ productRouter.post(
 productRouter.get(
   "/:id",
   expressAsyncHandler(async (req, res) => {
-    console.log('req.user:', req.user);
+    console.log("req.user:", req.user);
     const product = await Product.findById(req.params.id).populate(
       "seller",
       "seller.nameBrand seller.logo seller.rating seller.numReviews"
@@ -304,12 +355,10 @@ productRouter.get(
     if (!product) {
       return res.status(404).send({ message: "Product Not Found" });
     }
-    
-    res.send(product);
 
+    res.send(product);
   })
 );
-
 
 //product of seller
 productRouter.get(
@@ -346,42 +395,48 @@ const findSimilarProducts = async (product, page, limit) => {
 
 //router similar product
 productRouter.get(
-      "/:id/similar",
-      expressAsyncHandler(async (req, res) => {
-        const productId = req.params.id;
-        const product = await Product.findById(productId);
-        if (product) {
-          const page = parseInt(req.query.page) || 1;
-          const limit = parseInt(req.query.limit) || 4;
-          const similarProducts = await findSimilarProducts(product, page, limit);
-          res.send(similarProducts);
-        } else {
-          res.status(404).send({ message: "Product Not Found" });
-        }
-      })
-    );
+  "/:id/similar",
+  expressAsyncHandler(async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    if (product) {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 4;
+      const similarProducts = await findSimilarProducts(product, page, limit);
+      res.send(similarProducts);
+    } else {
+      res.status(404).send({ message: "Product Not Found" });
+    }
+  })
+);
 
 // route to save product view
-productRouter.post('/:id/view', isAuth , expressAsyncHandler(async(req , res)=>{
-  const productId = req.params.id 
-  const userId = req.user._id
- const product = await Product.findById(productId )
- // console.log(userId)
-  if(!product){
-    res.status(404).send({ message: "Product Not Found" });
-  }else{
-    const viewIndex = product.viewedProduct.findIndex(view=>(view.user.toString() === userId.toString()))
-    if (viewIndex !== -1){
-      product.viewedProduct[viewIndex].viewedAt = Date.now();
+productRouter.post(
+  "/:id/view",
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const productId = req.params.id;
+    const userId = req.user._id;
+    const product = await Product.findById(productId);
+    // console.log(userId)
+    if (!product) {
+      res.status(404).send({ message: "Product Not Found" });
     } else {
-      // Add a new view entry if the user hasn't viewed the product before
-      product.viewedProduct.push({ user: userId, viewedAt: Date.now() });
+      const viewIndex = product.viewedProduct.findIndex(
+        (view) => view.user.toString() === userId.toString()
+      );
+      if (viewIndex !== -1) {
+        product.viewedProduct[viewIndex].viewedAt = Date.now();
+      } else {
+        // Add a new view entry if the user hasn't viewed the product before
+        product.viewedProduct.push({ user: userId, viewedAt: Date.now() });
+      }
     }
-  }
-  await product.save();
+    await product.save();
 
-    res.status(201).send({ message: 'Product viewed', product });
-}))
+    res.status(201).send({ message: "Product viewed", product });
+  })
+);
 //route promotion
 productRouter.post(
   "/:id/promotion",
@@ -394,11 +449,11 @@ productRouter.post(
       res.status(404).send({ message: "Product not found" });
       return;
     }
-   
+
     const promotion = {
       discountedPrice: req.body.discountedPrice || product.discountedPrice,
       endDate: req.body.endDate || product.endDate,
-      originalPrice: product.price, 
+      originalPrice: product.price,
     };
 
     // Vérifiez si la promotion existante est expirée
@@ -406,7 +461,7 @@ productRouter.post(
       product.promotion = null; // Supprimer la promotion
     } else {
       product.promotion = promotion;
-      product.price = promotion.discountedPrice; // Mettre à jour le prix avec le prix remisé
+      
     }
 
     const updatedProduct = await product.save();
@@ -447,44 +502,48 @@ productRouter.post(
 );
 
 //route update product
-productRouter.put('/:id', isAuth , isSellerOrAdmin , upload.array("image", 5) , expressAsyncHandler(async(req , res)=>{
-  const product = await Product.findById(req.params.id)
-  if(!product){
-    res.status(404).send({ message: "Product not found" });
-    return;
-  }
- 
-  product.name = req.body.name || product.name;
-  product.price = req.body.price|| product.price;
-  product.category.main = req.body.mainCategory || product.category.main;
-  product.category.sub = req.body.subCategory || product.category.sub;
-  product.brand = req.body.brand || product.brand;
-  product.countInStock = req.body.countInStock || product.countInStock;
-  product.description = req.body.description || product.description 
-  if (req.files && req.files.length > 0) {
-    // Supprimez les anciennes images
-    if (product.images && product.images.length > 0) {
-      product.images.forEach((image) => {
-        fs.unlink(image.url, (err) => {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log(`Successfully deleted ${image.url}`);
-          }
-        });
-      });
+productRouter.put(
+  "/:id",
+  isAuth,
+  isSellerOrAdmin,
+  upload.array("image", 5),
+  expressAsyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      res.status(404).send({ message: "Product not found" });
+      return;
     }
 
-    // Mettez à jour le tableau d'images avec les nouveaux chemins
-    product.image = req.files.map(file => ({ url: file.path }));
-  }
-  
-  const updatedProduct = await product.save();
- 
+    product.name = req.body.name || product.name;
+    product.price = req.body.price || product.price;
+    product.category.main = req.body.mainCategory || product.category.main;
+    product.category.sub = req.body.subCategory || product.category.sub;
+    product.brand = req.body.brand || product.brand;
+    product.countInStock = req.body.countInStock || product.countInStock;
+    product.description = req.body.description || product.description;
+    if (req.files && req.files.length > 0) {
+      // Supprimez les anciennes images
+      if (product.images && product.images.length > 0) {
+        product.images.forEach((image) => {
+          fs.unlink(image.url, (err) => {
+            if (err) {
+              console.error(err);
+            } else {
+              console.log(`Successfully deleted ${image.url}`);
+            }
+          });
+        });
+      }
 
-  res.send({ message: "Product Updated", product: updatedProduct });
+      // Mettez à jour le tableau d'images avec les nouveaux chemins
+      product.image = req.files.map((file) => ({ url: file.path }));
+    }
 
-}))
+    const updatedProduct = await product.save();
+
+    res.send({ message: "Product Updated", product: updatedProduct });
+  })
+);
 
 //delete product
 productRouter.delete(
@@ -508,7 +567,6 @@ productRouter.delete(
 
       const deleteProduct = await product.deleteOne();
       res.send({ message: "Product Deleted", product: deleteProduct });
-
     } else {
       res.status(404).send({ message: "Product Not Found" });
     }
@@ -541,6 +599,5 @@ productRouter.delete(
     }
   })
 );
-
 
 export default productRouter;

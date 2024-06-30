@@ -7,6 +7,7 @@ import "./FeaturedProducts.css"; // Your custom styles
 import { useQuery } from "@tanstack/react-query";
 import { featuredproduct } from "../../API";
 import Product from "./Product";
+import Loading from "../Loading/Loading";
 
 const FeaturedProducts = () => {
   const { data, error, isLoading } = useQuery({
@@ -17,13 +18,13 @@ const FeaturedProducts = () => {
     staleTime: 100000,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="featured">
-      <div className="featured-title">
-        <h2>Featured Products</h2>
+    <div className="featured" >
+      <div className="featured-title" >
+        <h3>Featured Products</h3>
       </div>
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
@@ -34,8 +35,8 @@ const FeaturedProducts = () => {
         autoplay={{ delay: 3000, disableOnInteraction: true  }}
       >
         {data.map((product) => (
-          <SwiperSlide >
-            <Product key={product._id} product={product} />
+          <SwiperSlide key={product._id}>
+            <Product  product={product} />
           </SwiperSlide>
         ))}
       </Swiper>

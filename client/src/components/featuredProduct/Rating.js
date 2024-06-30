@@ -1,9 +1,7 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
 const Rating=(props) => {
-  const { rating, numReviews, caption } = props;
-  console.log(rating)
-  console.log(numReviews)
-  console.log(caption)
+  const { rating, numReviews } = props;
+
   
   return (
     <div className="rating">

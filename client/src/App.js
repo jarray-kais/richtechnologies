@@ -22,7 +22,7 @@ function App() {
       <Route path={"/"} element=<HomeScreen /> />
       <Route path={"/signin"} element=<SigningScreen /> />
       <Route path={"/register"} element=<SignupScreen /> />
-      <Route path={"/profile"} element={<Auth><ProfileScreen/></Auth>} />
+      <Route path={"/profile"} element={<Auth><ProfileScreen/></Auth>} exact/>
       <Route path={"/register-seller"} element=<SignupSellerScreen /> />
       <Route path={"/terms"} element=<TermsScreen /> />
       <Route path={"/privacy"} element=<PrivacyScreen /> />
