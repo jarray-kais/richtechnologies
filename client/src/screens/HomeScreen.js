@@ -50,7 +50,6 @@ const HomeScreen = () => {
         </div>
       </div>
       <Shopwithcategory />
-
       <div className="lorem">
         <div className="lorem-left">
           <h1>Have a Look at Our Unique Selling Proportions</h1>
@@ -85,27 +84,24 @@ const HomeScreen = () => {
           </div>
         </div>
       </div>
-      
       <div className="right-mac">
-          <div className="right-left">
-            <h4 className="introducing-right">SAVE UP TO $200.00</h4>
-            <div className="name-mac">
-              <p >Macbook Pro</p>
-            </div>
-            <div style={{ color: "#ADB7BC" }}>
-              <p>
-              Apple M1 Max Chip. 32GB Unified Memory, 1TB SSD Storage
-              </p>
-            </div>
-            <button className="add-to-card-button">Shop Now</button>
+        <div className="right-left">
+          <h4 className="introducing-right">SAVE UP TO $200.00</h4>
+          <div className="name-mac">
+            <p>Macbook Pro</p>
           </div>
-          <div className="right-right">
-            <div className="prix">1199 TND</div>
-            <div className="image-mac">
-              <img src="/images/mackbook.svg" alt="" />
-            </div>
+          <div style={{ color: "#ADB7BC" }}>
+            <p>Apple M1 Max Chip. 32GB Unified Memory, 1TB SSD Storage</p>
+          </div>
+          <button className="add-to-card-button">Shop Now</button>
+        </div>
+        <div className="right-right">
+          <div className="prix">1199 TND</div>
+          <div className="image-mac">
+            <img src="/images/mackbook.svg" alt="" />
           </div>
         </div>
+      </div>
     </div>
   );
 };
