@@ -2,7 +2,7 @@
 
 import './SuccessMessage.css';
 
-const SuccessMessage = (props ) => {
+const Message = (props ) => {
   return (
     <div className={`alert alert-${props.variant || 'info'}`}>
     {props.children}
@@ -10,4 +10,4 @@ const SuccessMessage = (props ) => {
   );
 };
 
-export default SuccessMessage;
+export default Message;

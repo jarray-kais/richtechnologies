@@ -101,3 +101,9 @@ export const getdeal5stars = async(page , limit)=>{
   const response = await axios.get(`/api/products/deal5stars?page=${page}&limit=${limit}`)
   return response.data;
 }
+
+//route shop with category --------------------------------
+export const shop = async()=>{
+  const response = await axios.get('/api/products/maincategories')
+  return response.data;
+}

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap");
  body {
   margin: 0;
 }
@@ -333,7 +334,7 @@
   font-weight: 400;
  
 }
-.right *{
+.right , .right-mac *{
   font-family: "Public Sans", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
@@ -362,7 +363,7 @@
 }
 .name-right{
   color: #ffffff;
-  font-size: 2rem;
+  font-size: 2.5rem;
 }
 .prix{
   background-color: #EFD33D;
@@ -372,7 +373,22 @@
   text-align: center;
   display: flex;
   align-items: center;
-  position: relative;
+  position: absolute;
+  top: 40px;
+}
+.prix-mac{
+  background-color: #EFD33D;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  position: absolute;
+ 
+  top: 50px;
+    right: 390px;
+
 }
 .image-right img{
   width: 19.5rem;
@@ -383,4 +399,70 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+}
+
+.lorem{
+  display: flex;
+  justify-content: space-around;
+  background-color: #FA8232;
+  height: 19.9rem;
+  width: 100%;
+}
+.lorem-left {
+  font-family: "Oxygen", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  color: white;
+  width: 30%;
+}
+#Read-buuton{
+  background-color: #1B6392;
+  border-radius: 15%;
+}
+
+.parag{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lorem-right{
+  font-family: "Oxygen", sans-serif;
+  font-weight: 700;
+  font-style: regular;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 35%;
+}
+.left-paragr,
+ .right-paragr{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+ 
+}
+.left-paragr h3,
+.right-paragr h3{
+  font-size: 2rem;
+}
+.right-mac{
+  width: 100%;
+  height: 100%;
+  background-color: #FDF3D2;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+} 
+.image-mac img{
+  width: 29rem;
+  height: 25rem ;
+
+}
+.name-mac{
+  color: #000;
+  font-size: 2.5rem;
 }

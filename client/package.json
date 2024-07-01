@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "proxy": "http://localhost:5000",
   "private": true,
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
@@ -19,7 +21,7 @@
     "react-query": "^3.39.3",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.23.1",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "swiper": "^11.1.4",
     "web-vitals": "^2.1.4"
   },
