@@ -363,6 +363,7 @@ productRouter.get(
       return res.status(404).send({ message: "Product Not Found" });
     }
     res.send(product);
+ 
   })
 );
 

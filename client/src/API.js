@@ -68,7 +68,16 @@ export const maincategory = async(category)=>{
   const response = await axios.get('/api/products/maincategories',{category})
   return response.data;
 }
-
+//route product by id --------------------------------
+export const findproduct = async (id) => {
+  try {
+    const response = await axios.get(`/api/products/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product details:', error); 
+    throw error;
+  }
+};
 //Route Brand ------------------------------------------------------------
 export const fetchbrand = async(category)=>{
   const encodecategory = encodeURIComponent(category)
@@ -112,12 +121,6 @@ export const shop = async()=>{
 //route accessoires --------------------------------
 export const accessoires = async( mainCategory , subCategory)=>{
   const response =await axios.get(`/api/products/main/${mainCategory}/${subCategory}`)
-  return response.data
-}
-
-//route product by id --------------------------------
-export const findproduct = async(id)=>{
-  const response = await axios.get(`/api/products/${id}`)
   return response.data
 }
 

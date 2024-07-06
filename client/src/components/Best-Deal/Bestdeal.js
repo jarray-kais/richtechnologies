@@ -18,7 +18,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import "swiper/css/effect-coverflow";
-import Carousel from "./Carousel";
+import CarouselImage from "./Carousel";
 const Bestdeal = () => {
   const overlay = useRef(null);
   const [showOverlay, setShowOverlay] = useState(false);
@@ -149,7 +149,7 @@ const Bestdeal = () => {
                       >
                         Fermer
                       </button>
-                      <Carousel images={imageUrls} />
+                      <CarouselImage images={imageUrls} />
                     </div>
                   </div>
                 )}

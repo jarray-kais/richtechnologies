@@ -1,9 +1,8 @@
 import { useState } from "react";
 
-const Carousel = ({ images }) => {
-  
+const CarouselImage = ({ images }) => {
+  console.log(images)
   const [currentIndex, setCurrentIndex] = useState(0);
-  
   const nextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
@@ -13,11 +12,10 @@ const Carousel = ({ images }) => {
       (prevIndex) => (prevIndex - 1 + images.length) % images.length
     );
   };
-
   return (
     <div className="carousel-container">
       <div className="carousel-main-image">
-        <img src={images[currentIndex]} alt={`Product ${currentIndex + 1}`} />
+        <img src={"/"+images[currentIndex]} alt={` ${currentIndex + 1}`} />
       </div>
       <div className="carousel-thumbnails">
         <button className="carousel-arrow" onClick={prevImage}>
@@ -27,8 +25,8 @@ const Carousel = ({ images }) => {
           {images.map((image, index) => (
             <img
               key={index}
-              src={image}
-              alt={`Thumbnail ${index + 1}`}
+              src={"/"+image}
+              alt={` ${index + 1}`}
               className={index === currentIndex ? "active" : ""}
               onClick={() => setCurrentIndex(index)}
             />
@@ -42,4 +40,4 @@ const Carousel = ({ images }) => {
   );
 };
 
-export default Carousel;
+export default CarouselImage;
