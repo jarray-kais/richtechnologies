@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { fetchbrand, maincategory } from "../../API";
+import { Link } from "react-router-dom";
 const DropdownCategory = () => {
   const dropdownRef = useRef(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -98,7 +99,8 @@ const DropdownCategory = () => {
             {!brandloading && !branderror && brand && (
               <ul className="brand-list">
                 {brand.map((brand, index) => (
-                  <li key={index} className="brand-item">{brand}</li>
+                  <li key={index} className="brand-item">
+                  <Link to={`/search?query=${brand}`} style={{textDecoration : "none"}}>{brand}</Link></li>
                 ))}
               </ul>
             )}

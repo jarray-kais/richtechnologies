@@ -11,6 +11,7 @@ import Header from "./components/Header/Header";
 import SignupSellerScreen from "./screens/SignupSellerScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import Auth from "./components/Auth";
+import SearchScreen from "./screens/SearchScreen";
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
     <main>
     <Routes>
       <Route path={"/"} element=<HomeScreen /> />
+      <Route path={"/search"} element=<SearchScreen /> />
       <Route path={"/signin"} element=<SigningScreen /> />
       <Route path={"/register"} element=<SignupScreen /> />
       <Route path={"/profile"} element={<Auth><ProfileScreen/></Auth>} exact/>

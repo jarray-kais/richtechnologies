@@ -71,7 +71,8 @@ export const maincategory = async(category)=>{
 
 //Route Brand ------------------------------------------------------------
 export const fetchbrand = async(category)=>{
-  const response = await axios.get(`/api/products/brand/${category}`)
+  const encodecategory = encodeURIComponent(category)
+  const response = await axios.get(`/api/products/brand?mainCategory=${encodecategory}`)
   return response.data;
 }
 
@@ -106,4 +107,25 @@ export const getdeal5stars = async(page , limit)=>{
 export const shop = async()=>{
   const response = await axios.get('/api/products/maincategories')
   return response.data;
+}
+
+//route accessoires --------------------------------
+export const accessoires = async( mainCategory , subCategory)=>{
+  const response =await axios.get(`/api/products/main/${mainCategory}/${subCategory}`)
+  return response.data
+}
+
+//route product by id --------------------------------
+export const findproduct = async(id)=>{
+  const response = await axios.get(`/api/products/${id}`)
+  return response.data
+}
+
+
+//Route search --------------------------------
+
+export const search = async(query , page )=>{
+  const response = await axios.get(`/api/products/search?query=${query}&page=${page}`)
+  console.log(query)
+  return response.data
 }

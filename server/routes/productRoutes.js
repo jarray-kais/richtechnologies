@@ -17,6 +17,8 @@ const client = new Client({
 });
 const productRouter = express.Router();
 
+
+
 // check promotions daily at midnight
 cron.schedule("0 0 * * *", async () => {
   try {
@@ -50,10 +52,58 @@ cron.schedule("0 0 * * *", async () => {
   }
 });
 
+
+//Route pour obtenir les brand de chaque maincategory
+productRouter.get(
+  "/brand",
+  expressAsyncHandler(async (req, res) => {
+    const mainCategory = req.query.mainCategory;
+    let brands ;
+    if(mainCategory) {
+      const decodedMainCategory = decodeURIComponent(mainCategory);
+      console.log(decodedMainCategory);
+    brands = await Product.distinct("brand", {
+      "category.main": decodedMainCategory,
+    });
+  }else{
+  brands = await Product.distinct("brand")
+    
+  }
+    res.send(brands);
+  })
+);
+productRouter.get(
+  "/main/:mainCategory/:subCategory?",
+  expressAsyncHandler(async (req, res) => {
+    const { mainCategory, subCategory } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const startIndex = (page - 1) * limit;
+
+    if (!subCategory) {
+      // Si subCategory n'est pas défini, retourner les sous-catégories
+      const mainCategoryProduct = await Product.find({
+        "category.main": mainCategory,
+      }).sort({ rating: -1 })
+      .skip(startIndex)
+      .limit(limit);
+      res.send(mainCategoryProduct);
+    } else {
+      // Si subCategory est défini, retourner les produits
+      const products = await Product.find({
+        "category.main": mainCategory,
+        "category.sub": subCategory,
+      })
+        .sort({ rating: -1 })
+        .skip(startIndex)
+        .limit(limit);
+      res.send(products);
+    }
+  })
+);  
 //Route of search
 productRouter.get(
   "/search",
-  isAuth,
   expressAsyncHandler(async (req, res) => {
     const {
       query,
@@ -62,7 +112,7 @@ productRouter.get(
       minPrice,
       maxPrice,
       page = 1,
-      pageSize = 9,
+      pageSize = 3,
     } = req.query;
 
     if (!query) {
@@ -189,7 +239,7 @@ productRouter.get(
     const limit = parseInt(req.query.limit);
     const startIndex = (page - 1) * limit;
     const featuredProducts = await Product.find({ rating: 5 })
-      .populate("seller", "seller.nameBrand")
+      .populate("seller", "name")
       .skip(startIndex)
       .limit(limit);
     res.send(featuredProducts);
@@ -250,7 +300,9 @@ productRouter.get(
   })
 );
 
-//Route pour obtenir les main-catégories
+
+
+ //Route pour obtenir les main-catégories
 productRouter.get(
   "/maincategories",
   expressAsyncHandler(async (req, res) => {
@@ -265,18 +317,22 @@ productRouter.get(
   "/:mainCategory/subcategories",
   expressAsyncHandler(async (req, res) => {
     const mainCategory = req.params.mainCategory;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const startIndex = (page - 1) * limit;
 
-    // Recherchez toutes les sous-catégories distinctes pour la catégorie principale spécifiée
     const subCategories = await Product.distinct("category.sub", {
       "category.main": mainCategory,
     });
-
     res.send(subCategories);
   })
 );
+
+
+
 //Route pour obtenir les produits d'une sous-catégorie spécifique :
 productRouter.get(
-  "/category/:mainCategory/:subCategory",
+  "/:mainCategory/:subCategory",
   expressAsyncHandler(async (req, res) => {
     const mainCategory = req.params.mainCategory;
     const subCategory = req.params.subCategory;
@@ -293,17 +349,20 @@ productRouter.get(
 
     res.send(products);
   })
-);
+);  
 
-//Route pour obtenir les brand de chaque maincategory
+//find product by id
 productRouter.get(
-  "/brand/:mainCategory",
+  "/:id",
   expressAsyncHandler(async (req, res) => {
-    const mainCategory = req.params.mainCategory;
-    const brands = await Product.distinct("brand", {
-      "category.main": mainCategory,
-    });
-    res.send(brands);
+    const product = await Product.findById(req.params.id).populate(
+      "seller",
+      "seller.nameBrand seller.logo seller.rating seller.numReviews"
+    );
+    if (!product) {
+      return res.status(404).send({ message: "Product Not Found" });
+    }
+    res.send(product);
   })
 );
 
@@ -343,22 +402,7 @@ productRouter.post(
     res.status(201).json(createdProduct);
   })
 );
-//find product by id
-productRouter.get(
-  "/:id",
-  expressAsyncHandler(async (req, res) => {
-    console.log("req.user:", req.user);
-    const product = await Product.findById(req.params.id).populate(
-      "seller",
-      "seller.nameBrand seller.logo seller.rating seller.numReviews"
-    );
-    if (!product) {
-      return res.status(404).send({ message: "Product Not Found" });
-    }
 
-    res.send(product);
-  })
-);
 
 //product of seller
 productRouter.get(

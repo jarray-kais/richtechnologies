@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
+import { Client } from '@elastic/elasticsearch-serverless';
 
-/*  const client = new Client({ node: process.env.URL ,
+ const client = new Client({ node: process.env.URL ,
   auth: {
       apiKey : process.env.apiKey
     },
-});  */
+});  
 
 
 const viewedProductSchema = new mongoose.Schema({
@@ -63,7 +64,7 @@ const productSchema = new mongoose.Schema(
     }
 );
 
-/* async function syncToElastic(doc, operation) {
+ async function syncToElastic(doc, operation) {
   let body;
   switch (operation) {
     case 'insert':
@@ -75,6 +76,7 @@ const productSchema = new mongoose.Schema(
           main: doc.category.main,
           sub: doc.category.sub
         },
+        rating : doc.rating,
         brand: doc.brand,
         price: doc.price,
         countInStock: doc.countInStock,
@@ -116,16 +118,18 @@ productSchema.pre('remove', function(next) {
 productSchema.post('delete', function(doc, next) {
   syncToElastic(doc, 'delete');
   next();
-}); */
+}); 
 
-productSchema.index({ 'category.main': 1, 'category.sub': 1 });
+
+productSchema.index({ 'category.main': 1, 'category.sub': 1 , 'name': 1  , 'brand': 1});
+
 
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;
 
 
-/*  async function syncData() {
+  async function syncData() {
 
   try {
     const dataset = await Product.find()
@@ -177,4 +181,3 @@ export default Product;
   
   }
   syncData();
- */

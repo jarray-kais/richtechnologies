@@ -3,6 +3,7 @@ import Bestdeal from "../components/Best-Deal/Bestdeal";
 import FeaturedProducts from "../components/featuredProduct/FeaturedProducts";
 import ImageCarousel from "../components/ImageCarousel/ImageCarousel";
 import Shopwithcategory from "../components/ShopWithCategory/Shopwithcategory";
+import Accessoires from "../components/Accessoires/Accessoires";
 
 const HomeScreen = () => {
   return (
@@ -102,6 +103,7 @@ const HomeScreen = () => {
           </div>
         </div>
       </div>
+      <Accessoires />
     </div>
   );
 };

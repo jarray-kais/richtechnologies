@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const Product = (props) => {
   const { product } = props;
   
-
+ 
   return (
     <div className="card" key={product._id}>
       <Link to={`/product/${product._id}`}>
@@ -29,8 +29,8 @@ const Product = (props) => {
           </div>
           </div>
            <div className="seller">
-           {product.seller&&product.seller.seller && product.seller.seller.nameBrand  ? (
-              <Link to={`/seller/${product.seller._id}`}>{!product.seller.seller.nameBrand}</Link>
+           {product.seller&&product.seller.seller && product.seller.name  ? (
+              <Link to={`/seller/${product.seller._id}`}>{product.seller.name}</Link>
             ) :null}
             
            </div>

@@ -26,12 +26,12 @@ const Shopwithcategory = () => {
     { isLoading ? (<Loading />) : error ? (<Message variant='danger'>{error}</Message>) : (
         <>
         <div className="featured-title" >
-        <h3>Shop with Categorys</h3>
+        <h3 >Shop with Categorys</h3>
       </div>
-      <Swiper className='category-swiper'
+      <Swiper className='category-swiper' 
         modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={10}
-        slidesPerView={7}
+        slidesPerView={6}
         navigation
         pagination={{ clickable: true }}
         autoplay={{ delay: 3000, disableOnInteraction: true  }}

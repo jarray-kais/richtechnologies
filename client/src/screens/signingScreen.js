@@ -32,7 +32,7 @@ const SigningScreen = () => {
     }
   return (
     <div>
-    
+
       <div className="signin-container">
       <div className="signin-left">
         <h2>Sign In</h2>

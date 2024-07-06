@@ -238,6 +238,8 @@ userRouter.post(
 userRouter.put(
   '/profile',
   isAuth,
+  upload.fields([{ name: 'profilePicture'}, { name: 'logo' }]),
+resizeImages ,
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (user) {
