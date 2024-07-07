@@ -1,20 +1,20 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import CarouselImage from "../components/Best-Deal/Carousel";
-import { useCart } from "../Context/CartContext";
 import { findproduct } from "../API";
 import Loading from "../components/Loading/Loading";
 import Message from "../components/Message/Message";
 import Rating from "../components/featuredProduct/Rating";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { Store } from "../Context/CartContext";
 
 const ProductdetailsScreen = () => {
   const { id } = useParams();
-  const {addToCart} = useCart()
-  const navigate = useNavigate()
+  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const { cart } = state;
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
 
-  
   const {
     data: productdetail,
     isLoading: loadingproductdetails,
@@ -26,17 +26,24 @@ const ProductdetailsScreen = () => {
     retry: 2,
   });
 
- 
   const imageUrls = productdetail?.image?.map((img) => img.url);
 
-  const handleAddToCart = () => {
-    addToCart({ ...productdetail, quantity });
-    navigate('/cart')
+  const addToCartHandler = async () => {
+    const existItem = cart.cartItems.find((x) => x._id === productdetail._id);
+    const updatedQuantity = existItem ? existItem.quantity + 1 : 1;
+    if (productdetail?.countInStock < updatedQuantity) {
+      window.alert('Sorry. Product is out of stock');
+      return;
+    }
+    ctxDispatch({
+      type: 'CART_ADD_ITEM',
+      payload: { ...productdetail, quantity: updatedQuantity },
+    });
+    navigate('/cart');
   };
 
-console.log(quantity)
   return (
-    <div className="peoductscreen">
+    <div className="productscreen">
       {loadingproductdetails ? (
         <Loading />
       ) : errorproductdetails ? (
@@ -44,7 +51,8 @@ console.log(quantity)
       ) : (
         <>
           <div className="ppp">
-            <h2>Product detail </h2><i className="fa fa-angle-right" aria-hidden="true"></i>
+            <h2>Product detail</h2>
+            <i className="fa fa-angle-right" aria-hidden="true"></i>
           </div>
           <div className="productDetail">
             <div className="caroselimage-productdetail">
@@ -52,59 +60,70 @@ console.log(quantity)
             </div>
             <div className="productDetail-right">
               <h2>{productdetail?.name}</h2>
-              <div>
-                <p>Price: ${productdetail?.price}</p>
-                <Rating
-                  rating={productdetail.rating}
-                  numReviews={productdetail.numReviews}
-                />
+              <div className="row">
+                <span className="price">{productdetail?.price} TND</span>
+                {productdetail?.promotion?.discountedPrice && (
+                  <div className="old-price">
+                    <span className="price-section">
+                      {productdetail.promotion.discountedPrice} TND
+                    </span>
+                  </div>
+                )}
               </div>
+              <Rating
+                rating={productdetail?.rating}
+                numReviews={productdetail?.numReviews}
+              />
               <div>
                 {productdetail?.countInStock > 0 ? (
                   <p>
-                    {" "}
-                    Availability:{" "}
-                    <span style={{ color: "green" }}>InStock</span>
+                    Availability: <span style={{ color: "green" }}>InStock</span>
                   </p>
                 ) : (
                   <p>
-                    Availability:{" "}
-                    <span style={{ color: "red" }}> Out of Stock</span>
+                    Availability: <span style={{ color: "red" }}>Out of Stock</span>
                   </p>
                 )}
-
-                <p> Brand{" "}:{" "}{productdetail?.brand}</p>
-                <p>Category{" "}:{" "} {productdetail?.category.sub}</p>
+                <p>Brand: {productdetail?.brand}</p>
+                <p>Category: {productdetail?.category.sub}</p>
               </div>
               <div className="horizontal-line"></div>
               <div className="description">
                 {productdetail?.description}
               </div>
-
               <div className="product-actions">
                 <div className="quantity-selector">
-                  <button className="quantity-button" onClick={() => setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1))}>-</button>
-                  <span className="quantity-display" >{quantity}</span>
-                  <button className="quantity-button" onClick={()=>setQuantity(prevQuantity => prevQuantity + 1)}>+</button>
+                  <button
+                    className="quantity-button"
+                    onClick={() => setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1))}
+                  >
+                    -
+                  </button>
+                  <span className="quantity-display">{quantity}</span>
+                  <button
+                    className="quantity-button"
+                    onClick={() => setQuantity(prevQuantity => prevQuantity + 1)}
+                  >
+                    +
+                  </button>
                 </div>
-                <button className="add-to-cart" onClick={handleAddToCart}>
+                <button className="add-to-cart" onClick={addToCartHandler}>
                   Add to Cart <span>&#9654;</span>
                 </button>
                 <button className="buy-now">Buy Now</button>
                 <div className="safe-checkout">
-                <p>100% Guarantee Safe Checkout</p>
-                <div className="payment-icons">
-                <img src="/images/ApplePay.svg" alt="apple" />
-                <img src="/images/GooglePay.svg" alt="googlepay" />
-                <img src="/images/Maestro.svg" alt="maestro" />
-                <img src="/images/Mastercard.svg" alt="mastercard" />
-                <img src="/images/Paypal.svg" alt="paypal" />
-                <img src="/images/Stripestripe.svg" alt="stripestripe" />
-                <img src="/images/Visa.svg" alt="visa" />
+                  <p>100% Guarantee Safe Checkout</p>
+                  <div className="payment-icons">
+                    <img src="/images/ApplePay.svg" alt="Apple Pay" />
+                    <img src="/images/GooglePay.svg" alt="Google Pay" />
+                    <img src="/images/Maestro.svg" alt="Maestro" />
+                    <img src="/images/Mastercard.svg" alt="Mastercard" />
+                    <img src="/images/Paypal.svg" alt="Paypal" />
+                    <img src="/images/Stripestripe.svg" alt="Stripe" />
+                    <img src="/images/Visa.svg" alt="Visa" />
+                  </div>
                 </div>
               </div>
-              </div>
-              
             </div>
           </div>
         </>

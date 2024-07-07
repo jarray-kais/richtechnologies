@@ -240,6 +240,7 @@ productRouter.get(
     const startIndex = (page - 1) * limit;
     const featuredProducts = await Product.find({ rating: 5 })
       .populate("seller", "name")
+      .populate("promotion", "discountedPrice")
       .skip(startIndex)
       .limit(limit);
     res.send(featuredProducts);

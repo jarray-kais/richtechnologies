@@ -1,10 +1,13 @@
 import "./Header.css";
 import { Link } from "react-router-dom";
 import DropdownCategory from "./DropdownCategory";
-import { useCart } from "../../Context/CartContext";
+import { useContext } from "react";
+import { Store } from "../../Context/CartContext";
+
 
 const Header = () => {
-  const { cart } = useCart();
+  const { state } = useContext(Store);
+  const { cart} = state;
 
   return (
     <div className="header">
@@ -47,9 +50,18 @@ const Header = () => {
           <img src="/images/search.svg" alt="search" className="search-icon" />
         </div>
         <div className="user-actions">
-          <Link to="/signin">Sign In</Link>
-          <div className="cart-badge"><Link to="/cart">Cart 🛒 {cart.length > 0 && <span className="badge">{cart.length}</span>}</Link></div>
+          <div className="badge-cart">
+          <Link to="/cart" className="nav-link">
+                  Cart
+                  {cart.cartItems.length > 0 && (
+                    <span className="badge">
+                      {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                    </span>
+                  )}
+                </Link>
+          </div>
           
+          <Link to="/signin">Sign In</Link>
         </div>
       </div>
     </div>

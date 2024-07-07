@@ -1,62 +1,79 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useReducer } from "react";
 
-const CartContext = createContext();
+export const Store = createContext();
 
-const cartReducer = (state, action) => {
+const initialiseState = {
+  userInfo: localStorage.getItem('userInfo')
+  ? JSON.parse(localStorage.getItem('userInfo'))
+  : null,
+  cart: {
+    shippingAddress: localStorage.getItem('shippingAddress')
+      ? JSON.parse(localStorage.getItem('shippingAddress'))
+      : {},
+      paymentMethod : localStorage.getItem('paymentMethod')
+      ? localStorage.getItem('paymentMethod')
+      : '',
+    cartItems: localStorage.getItem("cartItems")
+      ? JSON.parse(localStorage.getItem("cartItems"))
+      : [],
+  },
+};
+function reducer(state, action) {
   switch (action.type) {
-    case 'ADD_TO_CART':
-        const existingItemIndex = state.findIndex(item => item.id === action.payload.id);
-        if (existingItemIndex > -1) {
-          const updatedCart = state.map((item, index) =>
-            index === existingItemIndex ? { ...item, quantity: item.quantity + action.payload.quantity } : item
-          );
-          return updatedCart;
-        }
-        return [...state, { ...action.payload, quantity: action.payload.quantity || 1 }];
-    case 'REMOVE_FROM_CART':
-      return state.filter(item => item.id !== action.payload.id);
-      case 'UPDATE_QUANTITY':
-        return state.map(item =>
-          item.id === action.payload.id ? { ...item, quantity: action.payload.quantity } : item
-        );
-    case 'SET_CART':
-      return action.payload;
+    case "CART_ADD_ITEM":
+      // add to cart
+      const newItem = action.payload;
+      const existItem = state.cart.cartItems.find(
+        (item) => item._id === newItem._id
+      );
+      const cartItems = existItem
+        ? state.cart.cartItems.map((item) =>
+            item._id === existItem._id ? newItem : item
+          )
+        : [...state.cart.cartItems, newItem];
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      return { ...state, cart: { ...state.cart, cartItems } };
+    case "CART_REMOVE_ITEM": {
+      const cartItems = state.cart.cartItems.filter(
+        (item) => item._id !== action.payload._id
+      );
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      return { ...state, cart: { ...state.cart, cartItems } };
+    }
+    case 'CART_CLEAR':
+      return { ...state, cart: { ...state.cart, cartItems: [] } };
+    case 'USER_SIGNIN':
+      return { ...state, userInfo: action.payload };
+    case 'USER_SIGNOUT':
+      return {
+        ...state,
+        userInfo: null,
+      cart: {
+        cartItems: [],
+        shippingAddress: {},
+        paymentMethod: '',
+      },
+    };
+  case 'SAVE_SHIPPING_ADDRESS':
+    return {
+      ...state,
+      cart: {
+        ...state.cart,
+        shippingAddress: action.payload,
+      },
+    }
+    case 'SAVE_PAYMENT_METHOD':
+      return {
+        ...state,
+        cart: { ...state.cart, paymentMethod: action.payload },
+      };
     default:
       return state;
   }
-};
+}
 
-export const CartProvider = ({ children }) => {
-  const [cart, dispatch] = useReducer(cartReducer, [], () => {
-    const localData = localStorage.getItem('cart');
-    return localData ? JSON.parse(localData) : [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
-
-  const addToCart = item => {
-    dispatch({ type: 'ADD_TO_CART', payload: item });
-  };
-
-  const removeFromCart = id => {
-    dispatch({ type: 'REMOVE_FROM_CART', payload: { id } });
-  };
-  const updateQuantity = (id, quantity) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
-  };
-
-  const setCart = cartItems => {
-    dispatch({ type: 'SET_CART', payload: cartItems });
-  };
-
-
-  return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart , updateQuantity , setCart }}>
-      {children}
-    </CartContext.Provider>
-  );
-};
-
-export const useCart = () => useContext(CartContext);
+export function StoreProvider(props) {
+  const [state, dispatch] = useReducer(reducer, initialiseState);
+  const value = { state, dispatch };
+  return <Store.Provider value={value}>{props.children} </Store.Provider>;
+}
