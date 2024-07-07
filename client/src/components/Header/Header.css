@@ -279,40 +279,17 @@
   button:hover {
     text-decoration: underline;
   }
- 
-
-   /*  @media (max-width: 982px) {
-    .header {
-      height: 200px; /* Exemple de modification pour les petits écrans */
-   /* }
-  
- /* .col1 {
-      flex-direction:initial;
-      align-items: flex-start;
-      
-      gap: 10px;
-    }
-  
-    .nav-links {
-        flex-direction:initial;
-      gap: 10px;
-      margin: 0;
-    }
-  
-    .follow-us {
-      
-      gap: 10px;
-    }
-  
-    .col2 {
-     
-      gap: 10px;
-      padding: 10px;
-    }
-  
-    .search-bar {
-      margin: 0;
-    }
+  .badge {
+    background-color: #ff6347;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 10px;
+    font-size: 12px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
   }
- */
  
+.cart-badge{
+  display: flex;
+}

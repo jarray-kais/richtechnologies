@@ -1,9 +1,10 @@
 import "./Header.css";
 import { Link } from "react-router-dom";
 import DropdownCategory from "./DropdownCategory";
+import { useCart } from "../../Context/CartContext";
 
 const Header = () => {
-  
+  const { cart } = useCart();
 
   return (
     <div className="header">
@@ -47,7 +48,8 @@ const Header = () => {
         </div>
         <div className="user-actions">
           <Link to="/signin">Sign In</Link>
-          <Link to="/cart">Cart 🛒</Link>
+          <div className="cart-badge"><Link to="/cart">Cart 🛒 {cart.length > 0 && <span className="badge">{cart.length}</span>}</Link></div>
+          
         </div>
       </div>
     </div>

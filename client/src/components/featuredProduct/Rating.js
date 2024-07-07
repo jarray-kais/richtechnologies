@@ -59,7 +59,8 @@ const Rating=(props) => {
               : "fa fa-satr-o"
           }
         ></i>
-      </span>
+      </span>{"   "}
+      
       
       <span>({numReviews + "reviews"})</span>
     
