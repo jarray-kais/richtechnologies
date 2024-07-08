@@ -1,20 +1,24 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import CarouselImage from "../components/Best-Deal/Carousel";
-import { findproduct } from "../API";
+import { findproduct, postReview } from "../API";
 import Loading from "../components/Loading/Loading";
 import Message from "../components/Message/Message";
 import Rating from "../components/featuredProduct/Rating";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Store } from "../Context/CartContext";
 
 const ProductdetailsScreen = () => {
   const { id } = useParams();
   const { state, dispatch: ctxDispatch } = useContext(Store);
-  const { cart } = state;
+  const { cart, userInfo } = state;
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
-
+  const [message, setMessage] = useState("");
+  const [review, setReview] = useState({
+    comment: "",
+    rating: 0,
+  });
   const {
     data: productdetail,
     isLoading: loadingproductdetails,
@@ -26,24 +30,56 @@ const ProductdetailsScreen = () => {
     retry: 2,
   });
 
+  const mutation = useMutation({
+    mutationFn: postReview,
+    onSuccess: () => {
+      window.alert("success")
+    },
+    onError: (error) => {
+      const errorMessage =
+        error.response?.data?.message || error.message || "An error occurred";
+      setMessage(errorMessage);
+    },
+  });
+
+ 
+
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+    mutation.mutate({review , id});
+  },[review, id , mutation]) ;
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setReview((prevReview) => ({
+      ...prevReview,
+      [name]: value,
+    }));
+  },[]);
+  const handleRating = useCallback((rating) => {
+    setReview((prevReview) => ({
+      ...prevReview,
+      rating,
+    }));
+  },[]);
+
   const imageUrls = productdetail?.image?.map((img) => img.url);
 
   const addToCartHandler = async () => {
     const existItem = cart.cartItems.find((x) => x._id === productdetail._id);
     const updatedQuantity = existItem ? existItem.quantity + 1 : 1;
     if (productdetail?.countInStock < updatedQuantity) {
-      window.alert('Sorry. Product is out of stock');
+      window.alert("Sorry. Product is out of stock");
       return;
     }
     ctxDispatch({
-      type: 'CART_ADD_ITEM',
+      type: "CART_ADD_ITEM",
       payload: { ...productdetail, quantity: updatedQuantity },
     });
-    navigate('/cart');
+    navigate("/cart");
   };
-
+ 
   return (
-    <div className="productscreen">
+    <div className="productdetailscreen">
       {loadingproductdetails ? (
         <Loading />
       ) : errorproductdetails ? (
@@ -77,32 +113,38 @@ const ProductdetailsScreen = () => {
               <div>
                 {productdetail?.countInStock > 0 ? (
                   <p>
-                    Availability: <span style={{ color: "green" }}>InStock</span>
+                    Availability:{" "}
+                    <span style={{ color: "green" }}>InStock</span>
                   </p>
                 ) : (
                   <p>
-                    Availability: <span style={{ color: "red" }}>Out of Stock</span>
+                    Availability:{" "}
+                    <span style={{ color: "red" }}>Out of Stock</span>
                   </p>
                 )}
                 <p>Brand: {productdetail?.brand}</p>
                 <p>Category: {productdetail?.category.sub}</p>
               </div>
               <div className="horizontal-line"></div>
-              <div className="description">
-                {productdetail?.description}
-              </div>
+              <div className="description">{productdetail?.description}</div>
               <div className="product-actions">
                 <div className="quantity-selector">
                   <button
                     className="quantity-button"
-                    onClick={() => setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1))}
+                    onClick={() =>
+                      setQuantity((prevQuantity) =>
+                        prevQuantity > 1 ? prevQuantity - 1 : 1
+                      )
+                    }
                   >
                     -
                   </button>
                   <span className="quantity-display">{quantity}</span>
                   <button
                     className="quantity-button"
-                    onClick={() => setQuantity(prevQuantity => prevQuantity + 1)}
+                    onClick={() =>
+                      setQuantity((prevQuantity) => prevQuantity + 1)
+                    }
                   >
                     +
                   </button>
@@ -124,6 +166,80 @@ const ProductdetailsScreen = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+          <div className="Review">
+            <div className="body-Review">
+              <div className="Description-review">
+                <p>Description</p>
+                <div className="vertical-line"></div>
+                <p>reviews</p>
+              </div>
+              {productdetail?.reviews?.map((review, index) => (
+                <div className="reviews-user" key={review.index}>
+                  <div >
+                    <img className="avatar" src={"/" + review.profilePicture} alt={review.name} />
+                  </div>
+                  <div>
+                    <p className="name-review">{review.name}</p>
+                    <p>{review.comment}</p>
+                    <div className="Like">
+                      <p>Like</p>
+                      <p>Reply</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <form onSubmit={handleSubmit}>
+                <div className="review-form">
+                  <div className="form-group">
+                    <div>
+                      <img
+                        className="avatar"
+                        src={"/" + userInfo.profilePicture}
+                        alt={userInfo.name}
+                      />
+                    </div>
+                    <div className="input-container">
+                      <label>Your Name:</label>
+                      <div className="display-value">{userInfo.name}</div>
+                    </div>
+                    <div className="input-container">
+                      <label>Your Email:</label>
+                      <div className="display-value">{userInfo.email}</div>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <textarea
+                      id="review"
+                       name="comment"
+                      placeholder="Write your review..."
+                      value={review.comment}
+                      onChange={handleChange}
+                    ></textarea>
+                  </div>
+                  <div className="form-group">
+                    <label>Your Ratings:</label>
+                    <div className="ratings">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`star ${review.rating >= star ? 'selected' : ''}`}
+                onClick={() => handleRating(star)}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+                  </div>
+                  <button className="post-review">
+                    Post Review{" "}
+                    <i className="fa fa-angle-right" aria-hidden="true"></i>
+                    {mutation.isLoading ? <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i> : null}
+                  </button>
+                </div>
+                {message && <p className="error-message">{message}</p>}
+              </form>
             </div>
           </div>
         </>

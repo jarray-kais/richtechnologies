@@ -359,7 +359,7 @@ productRouter.get(
     const product = await Product.findById(req.params.id).populate(
       "seller",
       "seller.nameBrand seller.logo seller.rating seller.numReviews"
-    );
+    )
     if (!product) {
       return res.status(404).send({ message: "Product Not Found" });
     }
@@ -532,6 +532,7 @@ productRouter.post(
 
     const review = {
       name: req.user.name,
+      profilePicture: req.user.profilePicture,
       rating: Number(req.body.rating),
       comment: req.body.comment,
     };
@@ -540,7 +541,7 @@ productRouter.post(
     product.numReviews = product.reviews.length;
     product.rating =
       product.reviews.reduce((a, c) => c.rating + a, 0) /
-      product.reviews.length; // Remplace la promotion existante par la nouvelle
+      product.reviews.length; 
 
     const updatedProduct = await product.save();
     res.status(201).send(updatedProduct);

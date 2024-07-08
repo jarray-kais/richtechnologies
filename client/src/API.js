@@ -132,3 +132,11 @@ export const search = async(query , page )=>{
   console.log(query)
   return response.data
 }
+
+//Route post review --------------------------------
+export const postReview = async({review , id })=>{
+  console.log(id)
+  console.log(review)
+  const response = await axios.post(`/api/products/${id}/review`,review)
+  return response.data
+}
