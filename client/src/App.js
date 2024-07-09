@@ -13,6 +13,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import Auth from "./components/Auth";
 import SearchScreen from "./screens/SearchScreen";
 import ProductdetailsScreen from "./screens/ProductdetailsScreen";
+import CartScreen from "./screens/CartScreen";
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <Route path={"/search"} element=<SearchScreen /> />
       <Route path={"/signin"} element=<SigningScreen /> />
       <Route path={"/register"} element=<SignupScreen /> />
+      <Route path={"/cart"} element=<CartScreen /> />
       <Route path={"product/:id"} element=<ProductdetailsScreen /> />
       <Route path={"/profile"} element={<Auth><ProfileScreen/></Auth>} exact/>
       <Route path={"/register-seller"} element=<SignupSellerScreen /> />

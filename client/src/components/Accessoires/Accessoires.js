@@ -30,7 +30,7 @@ const Accessoires = () => {
     staleTime: 10000 * 60 * 5,
   })
   console.log(id)
-  console.log(find);
+  console.log(accessoires);
   const handleSubCategoryClick = (subCategory) => {
     setSubCategory(subCategory);
   };

@@ -7,7 +7,8 @@ import { Store } from "../../Context/CartContext";
 
 const Header = () => {
   const { state } = useContext(Store);
-  const { cart} = state;
+  const { cart , userInfo} = state;
+
 
   return (
     <div className="header">
@@ -50,18 +51,31 @@ const Header = () => {
           <img src="/images/search.svg" alt="search" className="search-icon" />
         </div>
         <div className="user-actions">
+        {
+            userInfo? (
+              <div className="user">
+                  <img className="avatar" src={"/"+userInfo.profilePicture} alt="user" />
+                  <p className="user-name">{userInfo.name}</p>
+                {/* <div className="dropdown-content">
+                  <Link to={`/profile/${userInfo._id}`}>Profile</Link>
+                  <Link to="/logout">Logout</Link>
+                </div> */}
+              </div>
+            ) : (
+              <Link to="/signin">Sign In</Link>
+            )
+          }
           <div className="badge-cart">
           <Link to="/cart" className="nav-link">
                   Cart
                   {cart.cartItems.length > 0 && (
-                    <span className="badge">
+                    <span className="badge-item">
                       {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
                     </span>
                   )}
                 </Link>
           </div>
           
-          <Link to="/signin">Sign In</Link>
         </div>
       </div>
     </div>

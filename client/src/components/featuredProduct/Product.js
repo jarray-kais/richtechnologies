@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 
 const Product = (props) => {
   const { product } = props;
-  
+  console.log(product);
 
   return (
     <div className="card" key={product._id}>
       <Link to={`/product/${product._id}`}>
-        <img className="image" src={product.image[0].url} alt={product.name} />
+        <img className="image" src={"/"+product.image[0].url} alt={product.name} />
       </Link>
       <div className="card-body">
         <Rating rating={product.rating} numReviews={product.numReviews} />

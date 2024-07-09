@@ -17,8 +17,6 @@ const client = new Client({
 });
 const productRouter = express.Router();
 
-
-
 // check promotions daily at midnight
 cron.schedule("0 0 * * *", async () => {
   try {
@@ -52,7 +50,6 @@ cron.schedule("0 0 * * *", async () => {
   }
 });
 
-
 //Route pour obtenir les brand de chaque maincategory
 productRouter.get(
   "/brand",
@@ -70,6 +67,30 @@ productRouter.get(
     
   }
     res.send(brands);
+  })
+);
+ //Route pour obtenir les main-catégories
+ productRouter.get(
+  "/maincategories",
+  expressAsyncHandler(async (req, res) => {
+    const mainCategories = await Product.distinct("category.main");
+
+    res.send(mainCategories);
+  })
+);
+//Route pour obtenir les sous-catégories d'une catégorie spécifique
+productRouter.get(
+  "/:mainCategory/subcategories",
+  expressAsyncHandler(async (req, res) => {
+    const mainCategory = req.params.mainCategory;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const startIndex = (page - 1) * limit;
+
+    const subCategories = await Product.distinct("category.sub", {
+      "category.main": mainCategory,
+    });
+    res.send(subCategories);
   })
 );
 productRouter.get(
@@ -100,7 +121,7 @@ productRouter.get(
       res.send(products);
     }
   })
-);  
+);
 //Route of search
 productRouter.get(
   "/search",
@@ -211,42 +232,6 @@ productRouter.get(
     }
   })
 );
-
-//route to fetch user view history
-productRouter.get(
-  "/history",
-  isAuth,
-  expressAsyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 4;
-    const startIndex = (page - 1) * limit;
-    const userId = req.user._id;
-    console.log(userId);
-    const history = await Product.find({ "viewedProduct.user": userId })
-      .select("name image rating numReviews viewedProduct")
-      .populate({ path: "viewedProduct.user", select: "viewedAt" })
-      .skip(startIndex)
-      .limit(limit);
-    res.send(history);
-  })
-);
-
-//router featured products
-productRouter.get(
-  "/featured",
-  expressAsyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit);
-    const startIndex = (page - 1) * limit;
-    const featuredProducts = await Product.find({ rating: 5 })
-      .populate("seller", "name")
-      .populate("promotion", "discountedPrice")
-      .skip(startIndex)
-      .limit(limit);
-    res.send(featuredProducts);
-  })
-);
-
 //route find deal products
 productRouter.get(
   "/deal",
@@ -278,7 +263,6 @@ productRouter.get(
     res.send(dealProducts);
   })
 );
-
 //router admin find all products
 productRouter.get(
   "/all",
@@ -300,112 +284,40 @@ productRouter.get(
     }
   })
 );
-
-
-
- //Route pour obtenir les main-catégories
+//route to fetch user view history
 productRouter.get(
-  "/maincategories",
+  "/history",
+  isAuth,
   expressAsyncHandler(async (req, res) => {
-    const mainCategories = await Product.distinct("category.main");
-
-    res.send(mainCategories);
-  })
-);
-
-//Route pour obtenir les sous-catégories d'une catégorie spécifique
-productRouter.get(
-  "/:mainCategory/subcategories",
-  expressAsyncHandler(async (req, res) => {
-    const mainCategory = req.params.mainCategory;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 6;
+    const limit = parseInt(req.query.limit) || 4;
     const startIndex = (page - 1) * limit;
-
-    const subCategories = await Product.distinct("category.sub", {
-      "category.main": mainCategory,
-    });
-    res.send(subCategories);
-  })
-);
-
-
-
-//Route pour obtenir les produits d'une sous-catégorie spécifique :
-productRouter.get(
-  "/:mainCategory/:subCategory",
-  expressAsyncHandler(async (req, res) => {
-    const mainCategory = req.params.mainCategory;
-    const subCategory = req.params.subCategory;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 6;
-    const startIndex = (page - 1) * limit;
-    const products = await Product.find({
-      "category.main": mainCategory,
-      "category.sub": subCategory,
-    })
-      .sort({ rating: -1 })
+    const userId = req.user._id;
+    console.log(userId);
+    const history = await Product.find({ "viewedProduct.user": userId })
+      .select("name image rating numReviews viewedProduct")
+      .populate({ path: "viewedProduct.user", select: "viewedAt" })
       .skip(startIndex)
       .limit(limit);
-
-    res.send(products);
+    res.send(history);
   })
-);  
-
-//find product by id
+);
+//router featured products
 productRouter.get(
-  "/:id",
+  "/featured",
   expressAsyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate(
-      "seller",
-      "seller.nameBrand seller.logo seller.rating seller.numReviews"
-    )
-    if (!product) {
-      return res.status(404).send({ message: "Product Not Found" });
-    }
-    res.send(product);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit);
+    const startIndex = (page - 1) * limit;
+    const featuredProducts = await Product.find({ rating: 5 })
+      .populate("seller", "name")
+      .populate("promotion", "discountedPrice")
+      .skip(startIndex)
+      .limit(limit);
+    res.send(featuredProducts);
+  })
+);
  
-  })
-);
-
-//create new product
-productRouter.post(
-  "/new",
-  isAuth,
-  isSellerOrAdmin,
-  upload.array("image", 5),
-  expressAsyncHandler(async (req, res) => {
-    const {
-      name,
-      description,
-      mainCategory,
-      subCategory,
-      brand,
-      price,
-      countInStock,
-    } = req.body;
-    const image = req.files.map((file) => ({ url: file.path }));
-    const product = new Product({
-      seller: req.user._id,
-      name,
-      description,
-      category: {
-        main: mainCategory,
-        sub: subCategory,
-      },
-      brand,
-      price,
-      countInStock,
-      image: image.map((image, index) => ({
-        url: image.url,
-      })),
-    });
-    const createdProduct = await product.save();
-    res.status(201).json(createdProduct);
-  })
-);
-
-
 //product of seller
 productRouter.get(
   "/:id/seller",
@@ -444,11 +356,14 @@ productRouter.get(
   "/:id/similar",
   expressAsyncHandler(async (req, res) => {
     const productId = req.params.id;
+   
     const product = await Product.findById(productId);
+    console.log(product);
     if (product) {
       const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 4;
+      const limit = parseInt(req.query.limit) || 8;
       const similarProducts = await findSimilarProducts(product, page, limit);
+      
       res.send(similarProducts);
     } else {
       res.status(404).send({ message: "Product Not Found" });
@@ -456,33 +371,81 @@ productRouter.get(
   })
 );
 
-// route to save product view
-productRouter.post(
-  "/:id/view",
-  isAuth,
+//find product by id
+productRouter.get(
+  "/:id",
   expressAsyncHandler(async (req, res) => {
-    const productId = req.params.id;
-    const userId = req.user._id;
-    const product = await Product.findById(productId);
-    // console.log(userId)
+    const product = await Product.findById(req.params.id).populate(
+      "seller",
+      "seller.nameBrand seller.logo seller.rating seller.numReviews"
+    )
     if (!product) {
-      res.status(404).send({ message: "Product Not Found" });
-    } else {
-      const viewIndex = product.viewedProduct.findIndex(
-        (view) => view.user.toString() === userId.toString()
-      );
-      if (viewIndex !== -1) {
-        product.viewedProduct[viewIndex].viewedAt = Date.now();
-      } else {
-        // Add a new view entry if the user hasn't viewed the product before
-        product.viewedProduct.push({ user: userId, viewedAt: Date.now() });
-      }
+      return res.status(404).send({ message: "Product Not Found" });
     }
-    await product.save();
-
-    res.status(201).send({ message: "Product viewed", product });
+    res.send(product);
+ 
   })
 );
+//Route pour obtenir les produits d'une sous-catégorie spécifique :
+productRouter.get(
+  "/:mainCategory/:subCategory",
+  expressAsyncHandler(async (req, res) => {
+    const mainCategory = req.params.mainCategory;
+    const subCategory = req.params.subCategory;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const startIndex = (page - 1) * limit;
+    const products = await Product.find({
+      "category.main": mainCategory,
+      "category.sub": subCategory,
+    })
+      .sort({ rating: -1 })
+      .skip(startIndex)
+      .limit(limit);
+
+    res.send(products);
+  })
+);  
+
+
+
+//create new product
+productRouter.post(
+  "/new",
+  isAuth,
+  isSellerOrAdmin,
+  upload.array("image", 5),
+  expressAsyncHandler(async (req, res) => {
+    const {
+      name,
+      description,
+      mainCategory,
+      subCategory,
+      brand,
+      price,
+      countInStock,
+    } = req.body;
+    const image = req.files.map((file) => ({ url: file.path }));
+    const product = new Product({
+      seller: req.user._id,
+      name,
+      description,
+      category: {
+        main: mainCategory,
+        sub: subCategory,
+      },
+      brand,
+      price,
+      countInStock,
+      image: image.map((image, index) => ({
+        url: image.url,
+      })),
+    });
+    const createdProduct = await product.save();
+    res.status(201).json(createdProduct);
+  })
+);
+
 //route promotion
 productRouter.post(
   "/:id/promotion",
@@ -548,6 +511,33 @@ productRouter.post(
   })
 );
 
+// route to save product view
+productRouter.post(
+  "/:id/view",
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const productId = req.params.id;
+    const userId = req.user._id;
+    const product = await Product.findById(productId);
+    // console.log(userId)
+    if (!product) {
+      res.status(404).send({ message: "Product Not Found" });
+    } else {
+      const viewIndex = product.viewedProduct.findIndex(
+        (view) => view.user.toString() === userId.toString()
+      );
+      if (viewIndex !== -1) {
+        product.viewedProduct[viewIndex].viewedAt = Date.now();
+      } else {
+        // Add a new view entry if the user hasn't viewed the product before
+        product.viewedProduct.push({ user: userId, viewedAt: Date.now() });
+      }
+    }
+    await product.save();
+
+    res.status(201).send({ message: "Product viewed", product });
+  })
+);
 //route update product
 productRouter.put(
   "/:id",

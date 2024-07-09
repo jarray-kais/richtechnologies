@@ -3,7 +3,7 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import "./FeaturedProducts.css"; // Your custom styles
+import "./FeaturedProducts.css";
 import { useQuery } from "@tanstack/react-query";
 import { featuredproduct } from "../../API";
 import Product from "./Product";

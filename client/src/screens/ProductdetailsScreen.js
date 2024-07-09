@@ -1,12 +1,13 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import CarouselImage from "../components/Best-Deal/Carousel";
-import { findproduct, postReview } from "../API";
+import { findproduct, postReview, similarProduct } from "../API";
 import Loading from "../components/Loading/Loading";
 import Message from "../components/Message/Message";
 import Rating from "../components/featuredProduct/Rating";
 import { useCallback, useContext, useState } from "react";
 import { Store } from "../Context/CartContext";
+import Product from "../components/featuredProduct/Product";
 
 const ProductdetailsScreen = () => {
   const { id } = useParams();
@@ -29,6 +30,17 @@ const ProductdetailsScreen = () => {
     refetchOnWindowFocus: false,
     retry: 2,
   });
+
+  const {
+    data : similarproduct ,
+    isLoading : similarLoading,
+    error : similarError,
+  } = useQuery({
+    queryKey: ["similar", id],
+    queryFn: () => similarProduct(id),
+    refetchOnWindowFocus: false,
+    retry: 2,
+  })
 
   const mutation = useMutation({
     mutationFn: postReview,
@@ -77,13 +89,13 @@ const ProductdetailsScreen = () => {
     });
     navigate("/cart");
   };
- 
+ console.log(similarproduct)
   return (
     <div className="productdetailscreen">
       {loadingproductdetails ? (
         <Loading />
       ) : errorproductdetails ? (
-        <Message variant="danger">{errorproductdetails.message}</Message>
+        <Message variant="danger">{errorproductdetails?.message}</Message>
       ) : (
         <>
           <div className="ppp">
@@ -192,7 +204,7 @@ const ProductdetailsScreen = () => {
               ))}
               <form onSubmit={handleSubmit}>
                 <div className="review-form">
-                  <div className="form-group">
+                  <div className="form-grouppp">
                     <div>
                       <img
                         className="avatar"
@@ -209,8 +221,9 @@ const ProductdetailsScreen = () => {
                       <div className="display-value">{userInfo.email}</div>
                     </div>
                   </div>
-                  <div className="form-group">
+                  <div className="form-grouppp">
                     <textarea
+                    className="textareaa"
                       id="review"
                        name="comment"
                       placeholder="Write your review..."
@@ -218,7 +231,7 @@ const ProductdetailsScreen = () => {
                       onChange={handleChange}
                     ></textarea>
                   </div>
-                  <div className="form-group">
+                  <div className="form-grouppp">
                     <label>Your Ratings:</label>
                     <div className="ratings">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -242,6 +255,22 @@ const ProductdetailsScreen = () => {
               </form>
             </div>
           </div>
+          { similarLoading ? (<Loading />) : similarError ?(<Message variant="danger">{similarError.message}</Message>) :(
+            <div className="similar">
+          <div className="more"> 
+          <h1>Similar Product</h1>
+          <Link to={`/search?query=${productdetail?.category.main}`}> Show More {'>'} {'>'} </Link>
+          </div>
+          <div className="related-products">
+            {
+              similarproduct?.map((product , index)=>(
+                <Product key={product.index} product={product}/>
+              ))
+            }
+          </div>
+          </div>
+          )}
+          
         </>
       )}
     </div>

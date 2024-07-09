@@ -99,8 +99,11 @@ const DropdownCategory = () => {
             {!brandloading && !branderror && brand && (
               <ul className="brand-list">
                 {brand.map((brand, index) => (
-                  <li key={index} className="brand-item">
-                  <Link to={`/search?query=${brand}`} style={{textDecoration : "none"}}>{brand}</Link></li>
+                  <Link to={`/search?query=${brand}`} style={{textDecoration : "none"}}>
+                  <li key={index} className="brand-item">{brand}
+                 </li>
+                  </Link>
+                  
                 ))}
               </ul>
             )}

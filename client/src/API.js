@@ -140,3 +140,9 @@ export const postReview = async({review , id })=>{
   const response = await axios.post(`/api/products/${id}/review`,review)
   return response.data
 }
+//Route Similar Product --------------------------------
+
+export const similarProduct = async(id )=>{
+  const response = await axios.get(`/api/products/${id}/similar`)
+  return response.data
+}
