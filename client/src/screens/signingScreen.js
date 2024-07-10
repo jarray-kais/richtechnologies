@@ -22,6 +22,7 @@ const SigningScreen = () => {
     
         onSuccess : (data) => {
         Cookies.set('token',  data.token, { expires: 1 } )
+dispatch({ type: 'USER_SIGNIN' , payload: data});
         localStorage.setItem("userInfo", JSON.stringify(data));
         navigate('/')
         
