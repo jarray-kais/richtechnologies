@@ -14,17 +14,9 @@ userInfo
     } = state;
 
     const UpdateCartHandler = async (item, quantity) => {
-        const {
-            data: productdetail,
-            isLoading: loadingproductdetails,
-            error: errorproductdetails,
-          } = useQuery({
-            queryKey: ["productdetails", item._id],
-            queryFn: () => findproduct(item._id),
-            refetchOnWindowFocus: false,
-            retry: 2,
-          });
-        if (productdetail.countInStock < quantity) {
+        const { data: productdetail } = await findproduct(item._id);
+
+      if (productdetail && productdetail.countInStock < quantity) {
           window.alert('Sorry. Product is out of stock');
           return;
         }
