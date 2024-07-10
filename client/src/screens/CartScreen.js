@@ -30,6 +30,9 @@ userInfo
       };
     
       const checkoutHandler = () => {
+if(userInfo){
+          navigate('/shipping');
+        }else{
         navigate('/signin?redirect=/shipping');
       };
   return (
