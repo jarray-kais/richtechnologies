@@ -1,21 +1,47 @@
 import "./Header.css";
 import { Link } from "react-router-dom";
 import DropdownCategory from "./DropdownCategory";
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Store } from "../../Context/CartContext";
 
-
 const Header = () => {
-  const { state } = useContext(Store);
-  const { cart , userInfo} = state;
+  const dropdownRef = useRef(null);
+  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const { cart, userInfo } = state;
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const handleButtonClick = () => {
+    toggleDropdown();
+  };
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setDropdownOpen(false);
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const signoutHandler = () => {
+    ctxDispatch({ type: "USER_SIGNOUT" });
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("shippingAddress");
+    localStorage.removeItem("paymentMethod");
+  };
 
   return (
     <div className="header">
       <div className="col1">
         <div className="logo">
           <Link to="/">
-            <img src="/images/logo.svg" alt="logo"  style={{height : "80px"}}/>
+            <img src="/images/logo.svg" alt="logo" style={{ height: "80px" }} />
           </Link>
         </div>
         <div className="nav-links">
@@ -51,31 +77,127 @@ const Header = () => {
           <img src="/images/search.svg" alt="search" className="search-icon" />
         </div>
         <div className="user-actions">
-        {
-            userInfo? (
-              <div className="user">
-                  <img className="avatar" src={"/"+userInfo.profilePicture} alt="user" />
-                  <p className="user-name">{userInfo.name}</p>
-                {/* <div className="dropdown-content">
-                  <Link to={`/profile/${userInfo._id}`}>Profile</Link>
-                  <Link to="/logout">Logout</Link>
-                </div> */}
+          {userInfo ? (
+            <div className="all-categories" ref={dropdownRef}>
+              <div onClick={handleButtonClick} className="user">
+                <img
+                  className="avatar"
+                  src={"/" + userInfo.profilePicture}
+                  alt="user"
+                />
+                <p className="user-name">{userInfo.name}</p>
               </div>
-            ) : (
-              <Link to="/signin">Sign In</Link>
-            )
-          }
-          <div className="badge-cart">
-          <Link to="/cart" className="nav-link">
-                  Cart
-                  {cart.cartItems.length > 0 && (
-                    <span className="badge-item">
-                      {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+
+              {dropdownOpen && (
+                <ul className="category-list">
+                <Link to="#" style={{textDecoration : "none"}}>
+                  <li className="category-item user-item">
+                    <span>
+                      <img src="/images/dashboard.svg" alt="dashboard" />
                     </span>
+                    Dashboard
+                  </li></Link>
+                  {userInfo.isSeller && (
+                    <Link to="#" style={{textDecoration : "none"}}>
+                    <li className="category-item user-item">
+                      <span>
+                        <img src="/images/product.svg" alt="product" />
+                      </span>
+                      Products
+                    </li></Link>
                   )}
-                </Link>
+                  {userInfo.isAdmin && (
+                    <>
+                    <Link to="#" style={{textDecoration : "none"}}>
+                      <li className="category-item user-item">
+                        <span>
+                          <img src="/images/storeOrder.svg" alt="order" />
+                        </span>
+                        Order History
+                      </li>
+                      <li className="category-item user-item">
+                        <span>
+                          <img src="/images/Messenger.svg" alt="messenger" />
+                        </span>
+                        Support chat
+                      </li></Link>
+                      <Link to="#" style={{textDecoration : "none"}}>
+                      <li className="category-item user-item">
+                        <span>
+                          <i class="fa fa-users" aria-hidden="true"></i>
+                        </span>
+                        users
+                      </li>
+                      </Link>
+                    </>
+                  )}
+                  <Link to="#" style={{textDecoration : "none"}}>
+                  <li className="category-item user-item">
+                    <span>
+                      <img src="/images/storeOrder.svg" alt="order" />
+                    </span>
+                    Order History
+                  </li>
+                  </Link>
+                  <Link to="#" style={{textDecoration : "none"}}>
+                  <li className="category-item user-item">
+                    <span>
+                      <i className="fa fa-map-marker" aria-hidden="true"></i>
+                    </span>
+                    Track Order
+                  </li>
+                  </Link>
+                  <Link to="#" style={{textDecoration : "none"}}>
+                  <li className="category-item user-item">
+                    <span>
+                      <i className="fa fa-shopping-cart" aria-hidden="true"></i>
+                    </span>
+                    Shopping Cart
+                  </li>
+                  </Link>
+                  <Link to="#" style={{textDecoration : "none"}}>
+                  <li className="category-item user-item">
+                    <span>
+                      <i className="fa fa-history" aria-hidden="true"></i>
+                    </span>
+                    Browsing History
+                  </li>
+                  </Link>
+                  <Link to="#" style={{textDecoration : "none"}}>
+                  <li className="category-item user-item">
+                    <span>
+                      <i className="fa fa-cog" aria-hidden="true"></i>
+                    </span>
+                    Settings
+                  </li>
+                  </Link>
+                  <Link to="#" style={{textDecoration : "none"}}>
+                  <li
+                    className="category-item user-item"
+                    onClick={signoutHandler}
+                  >
+                    <span>
+                      <i className="fa fa-sign-out" aria-hidden="true"></i>
+                    </span>
+                    Log-out
+                  </li>
+                  </Link>
+                </ul>
+              )}
+            </div>
+          ) : (
+            <Link to="/signin">Sign In</Link>
+          )}
+          <div className="badge-cart">
+            <Link to="/cart" className="nav-link">
+              Cart
+              {cart.cartItems.length > 0 && (
+                <span className="badge-item">
+                  {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                </span>
+              )}
+            </Link>
           </div>
-          
         </div>
       </div>
     </div>

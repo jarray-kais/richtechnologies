@@ -59,17 +59,22 @@ const CartScreen = () => {
                       <h3>{item.name}</h3>
                     </div>
                     <div>
-                      <select
-                        value={item.quantity}
-                        onChange={(e) =>
-                          UpdateCartHandler(item, parseInt(e.target.value))
+                      <select>
+                      <button onClick={() =>
+                          UpdateCartHandler(item, item.quantity - 1)
+                        } variant="light" disabled={item.quantity === 1}>
+                        <i className="fas fa-minus-circle"></i>
+                      </button>{" "}
+                      <span>{item.quantity}</span>{" "}
+                      <button
+                      onClick={() =>
+                        UpdateCartHandler(item, item.quantity + 1)
                         }
+                        variant="light"
+                        disabled={item.quantity === item.countInStock}
                       >
-                        {[...Array(item.countInStock).keys()].map((x) => (
-                          <option key={x + 1} value={x + 1}>
-                            {x + 1}
-                          </option>
-                        ))}
+                        <i className="fas fa-plus-circle"></i>
+                      </button>
                       </select>
                       <button
                         className='btn btn-danger btn-sm'
