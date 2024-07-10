@@ -3,7 +3,7 @@ import Message from "../components/Message/Message";
 import { Link, useNavigate } from 'react-router-dom';
 import { Store } from '../Context/CartContext';
 import { findproduct } from '../API';
-import { useQuery } from '@tanstack/react-query';
+
 
 const CartScreen = () => {
     const navigate = useNavigate();
