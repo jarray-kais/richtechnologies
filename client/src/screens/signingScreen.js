@@ -24,7 +24,8 @@ const SigningScreen = () => {
         Cookies.set('token',  data.token, { expires: 1 } )
 dispatch({ type: 'USER_SIGNIN' , payload: data});
         localStorage.setItem("userInfo", JSON.stringify(data));
-        navigate('/')
+        
+        navigate(redirect || '/');
         
         } ,
         onError: (error) => {
@@ -37,6 +38,11 @@ dispatch({ type: 'USER_SIGNIN' , payload: data});
         e.preventDefault()
         mutation.mutate({email, password})
     }
+    useEffect(() => {
+      if (userInfo) {
+        navigate(redirect);
+      }
+    }, [navigate, redirect, userInfo]);
   return (
     <div>
 
