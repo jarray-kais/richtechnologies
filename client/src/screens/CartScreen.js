@@ -33,47 +33,53 @@ userInfo
         navigate('/signin?redirect=/shipping');
       };
   return (
-    <div className='cart'>
-    
-    <div className='cart-left'>
+      <div className="cart-container">
+        <div className="cart-left">
         <h1>Shopping Cart</h1>
     </div>
-        {cartItems.length === 0 ? (
             <Message>
               Cart Is Empty <Link to="/">Go Shopping</Link>
             </Message>
-          ):(
+          ) : (
             <>
-            <div className='List-group'>
                 {cartItems.map((item) => (
-                  <div key={item._id} className='list-group-item d-flex justify-content-between'>
-                    <div>
-                      <img src={item.image[0].url} alt={item.name} className='img-fluid rounded-start' />
-                      <h3>{item.name}</h3>
+                  <div key={item._id} className="cart-item">
+                  <div className="cart-item-details">
+                  <Link to={`/product/${item._id}`} className="cart-item-name">
+                    <img src={item.image[0].url} alt={item.name} className="cart-item-image" />
+                    </Link>
+                    <div className="cart-item-info">
+                      <Link to={`/product/${item._id}`} className="cart-item-name">
+                        {item.name}
+                      </Link>
+                      <div className="cart-item-price">${item.price}</div>
                     </div>
-                    <div>
-                      <select>
-                      <button onClick={() =>
-                          UpdateCartHandler(item, item.quantity - 1)
-                        } variant="light" disabled={item.quantity === 1}>
-                        <i className="fas fa-minus-circle"></i>
-                      </button>{" "}
-                      <span>{item.quantity}</span>{" "}
+                    </div>
+                      <div className="cart-item-actions">
+                  
+                    <button
+                      onClick={() => UpdateCartHandler(item, item.quantity - 1)}
+                      className="quantity-btn"
+                      disabled={item.quantity === 1}
+                    >
+                      -
+                    </button>
+                        <span className="cart-item-quantity">{item.quantity}</span>
                       <button
-                      onClick={() =>
-                        UpdateCartHandler(item, item.quantity + 1)
-                        }
-                        variant="light"
+                      onClick={() => UpdateCartHandler(item, item.quantity + 1)}
+                      className="quantity-btn"
                         disabled={item.quantity === item.countInStock}
                       >
-                        <i className="fas fa-plus-circle"></i>
+                        +
                       </button>
-                      </select>
+                      
                       <button
-                        className='btn btn-danger btn-sm'
-                        onClick={() => removeItemHandler(item)}>
+                        onClick={() => removeItemHandler(item)}
+                      className="remove-btn"
+                    >
                         <i className="fas fa-trash"></i>
                         </button>
+<div className="cart-item-total">${item.price * item.quantity}</div>
                     </div> 
               </div> 
               ))}
