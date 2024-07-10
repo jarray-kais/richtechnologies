@@ -967,7 +967,7 @@ textarea {
 
 .cart-right {
   flex: 1;
-  padding-left: 20px;
+  margin-left: 20px;
 }
 .list-group-item {
   display: flex;
