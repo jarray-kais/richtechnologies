@@ -969,12 +969,14 @@ textarea {
   flex: 1;
   margin-left: 20px;
 }
-.list-group-item {
+
+.cart-item {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #ddd;
+  align-items: center;
   padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+
 }
 
 .list-group-item img {
