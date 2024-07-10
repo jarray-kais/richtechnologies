@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { signIn } from "../API";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { Store } from "../Context/CartContext";
 
 
 
