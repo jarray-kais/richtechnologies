@@ -10,6 +10,7 @@ const CartScreen = () => {
     const { state, dispatch: ctxDispatch } = useContext(Store);
     const {
       cart: { cartItems },
+userInfo
     } = state;
 
     const UpdateCartHandler = async (item, quantity) => {
