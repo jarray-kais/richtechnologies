@@ -87,16 +87,25 @@ userInfo
             </div>
             </>
           )}
-    <div className='cart-right'></div>
-
-                
-                    <div>
-                        <h3>Subtotal: {cartItems.reduce((a, c) => a + c.price * c.quantity, 0)} TND</h3>
-                        <button className='btn btn-primary' onClick={checkoutHandler}>Checkout</button>
+        </div>
+        <div className="cart-right">
+          <div className="cart-summary">
+            <h2>Cart Summary</h2>
+            <div className="summary-item">
+              <span>Total Amount in Cart</span>
+              <span>TND{" "}{cartItems.reduce((a, c) => a + c.price * c.quantity, 0)}</span>
+            </div>
+            <div className="summary-item">
+              <span>Shipping Fee</span>
+              <span>TND{" "} {cartItems.reduce((a, c) => a + c.price * c.quantity, 0) > 1000 ? 'Free' : '20'}</span>
+            </div>
+            <div className="summary-item">
+              <span>Total Amount</span>
+              <span>TND{" "} {cartItems.reduce((a, c) => a + c.price * c.quantity, 0) + (cartItems.reduce((a, c) => a + c.price * c.quantity, 0) > 1000 ? 0 : 20)}</span>
                     </div>
-                    
-                    <div>
-                        <Link to='/'>Continue Shopping</Link>
+            <button onClick={checkoutHandler} className="checkout-btn">
+              Checkout
+            </button>
                     </div>
                     
                     <div>
