@@ -14,6 +14,8 @@ import Auth from "./components/Auth";
 import SearchScreen from "./screens/SearchScreen";
 import ProductdetailsScreen from "./screens/ProductdetailsScreen";
 import CartScreen from "./screens/CartScreen";
+import ShippingScreen from "./screens/ShippingScreen";
+
 
 
 function App() {
