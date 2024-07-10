@@ -953,13 +953,12 @@ textarea {
 }
 
 /* cartscreeen ------------------------------ */
-.cart {
+.cart-container {
+  max-width: 1905px;
+  margin: 0 auto ;
   display: flex;
-  flex-direction: column; /* Pour une meilleure gestion sur mobile */
-  gap: 20px; /* Espacement entre les éléments */
+  justify-content: space-between;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
 }
 
 .cart-left {
