@@ -29,8 +29,35 @@ const ShippingAddressScreen = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-   
+    ctxDispatch({
+      type: 'SAVE_SHIPPING_ADDRESS',
+      payload: {
+        fullName,
+        address,
+        city,
+        postalCode,
+        country,
+        location: shippingAddress.location,
+      },
+    });
+    localStorage.setItem(
+      'shippingAddress',
+      JSON.stringify({
+        fullName,
+        address,
+        city,
+        postalCode,
+        country,
+        location: shippingAddress.location,
+      })
+    );
+    navigate('/payment');
   };
+
+  useEffect(() => {
+    ctxDispatch({ type: 'SET_FULLBOX_OFF' });
+  }, [ctxDispatch, fullBox]);
+
 
   return (
     <div className="shipping-container">
