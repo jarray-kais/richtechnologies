@@ -5,11 +5,27 @@ import { Store } from '../Context/CartContext';
 import CheckoutSteps from '../components/Chekout/CheckoutSteps';
 
 const ShippingAddressScreen = () => {
-  const [fullName, setFullName] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [postalCode, setPostalCode] = useState('');
+  const navigate = useNavigate();
+  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const {
+    fullBox,
+    userInfo,
+    cart: { shippingAddress },
+  } = state;
+  const [fullName, setFullName] = useState(shippingAddress.fullName || '');
+  const [address, setAddress] = useState(shippingAddress.address || '');
+  const [city, setCity] = useState(shippingAddress.city || '');
+  const [postalCode, setPostalCode] = useState(
+    shippingAddress.postalCode || ''
+  );
+  const [country, setCountry] = useState(shippingAddress.country || '');
+    
+  useEffect(() => {
+    if (!userInfo) {
+      navigate('/signin?redirect=/shipping');
+    }
+  }, [userInfo, navigate]);
+  
 
   const submitHandler = (e) => {
     e.preventDefault();
