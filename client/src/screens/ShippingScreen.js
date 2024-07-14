@@ -61,6 +61,7 @@ const ShippingAddressScreen = () => {
 
   return (
     <div className="shipping-container">
+<CheckoutSteps step1 step2 step3={false} />
     
     <div className='shipping-body'>
     <BackButton />
