@@ -32,6 +32,8 @@ function App() {
       <Route path={"/register"} element=<SignupScreen /> />
       <Route path={"/cart"} element=<CartScreen /> />
       <Route path={"/shipping"} element=<ShippingScreen /> />
+      <Route path={"/payment"} element=<PaymentMethodScreen /> />
+      <Route path={"/map"} element={<Auth><MapScreen /></Auth>} />
       <Route path={"product/:id"} element=<ProductdetailsScreen /> />
       <Route path={"/profile"} element={<Auth><ProfileScreen/></Auth>} exact/>
       <Route path={"/register-seller"} element=<SignupSellerScreen /> />
