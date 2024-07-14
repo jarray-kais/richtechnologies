@@ -35,12 +35,17 @@ const CartScreen = () => {
       };
     
       const checkoutHandler = () => {
-        if(userInfo){
+        if(cartItems && cartItems.length){
+            if(userInfo){
           navigate('/shipping');
         }else{
           navigate('/signin?redirect=/shipping');
 
         }
+        }else{
+          alert('Cart is Empty')
+        }
+      
         
       };
 
