@@ -77,7 +77,23 @@ const ShippingAddressScreen = () => {
             onChange={(e) => setFullName(e.target.value)}
             required
           />
-          <button className="location-btn">choose Location</button>
+          <button
+            className="form-control"
+            type="button"
+            variant="light"
+            value={address}
+            onClick={() => navigate('/map')}
+            required >
+             Choose Location On Map
+          </button>
+{shippingAddress.location && shippingAddress.location.lat ? (
+              <div>
+                LAT: {shippingAddress.location.lat}
+                LNG:{shippingAddress.location.lng}
+              </div>
+            ) : (
+              <div>No location</div>
+            )}
         </div>
         <div className="form-group">
           <label className="form-label">Address</label>
