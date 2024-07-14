@@ -15,6 +15,8 @@ import SearchScreen from "./screens/SearchScreen";
 import ProductdetailsScreen from "./screens/ProductdetailsScreen";
 import CartScreen from "./screens/CartScreen";
 import ShippingScreen from "./screens/ShippingScreen";
+import MapScreen from "./screens/MapScreen";
+import PaymentMethodScreen from "./screens/PaymentMethodScreen";
 
 
 
