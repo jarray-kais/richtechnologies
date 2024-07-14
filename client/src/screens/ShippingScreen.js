@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import BackButton from '../components/BackButton/BackButton';
+import { useNavigate } from 'react-router-dom';
+import { Store } from '../Context/CartContext';
+import CheckoutSteps from '../components/Chekout/CheckoutSteps';
 
 const ShippingAddressScreen = () => {
   const [fullName, setFullName] = useState('');
