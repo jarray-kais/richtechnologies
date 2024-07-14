@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import BackButton from '../components/BackButton/BackButton';
 import { useNavigate } from 'react-router-dom';
 import { Store } from '../Context/CartContext';
@@ -61,7 +61,7 @@ const ShippingAddressScreen = () => {
 
   return (
     <div className="shipping-container">
-<CheckoutSteps step1 step2 step3={false} />
+    <CheckoutSteps step1 step2 step3={false} />
     
     <div className='shipping-body'>
     <BackButton />
@@ -87,7 +87,7 @@ const ShippingAddressScreen = () => {
             required >
              Choose Location On Map
           </button>
-{shippingAddress.location && shippingAddress.location.lat ? (
+           {shippingAddress.location && shippingAddress.location.lat ? (
               <div>
                 LAT: {shippingAddress.location.lat}
                 LNG:{shippingAddress.location.lng}
@@ -97,11 +97,11 @@ const ShippingAddressScreen = () => {
             )}
         </div>
         <div className="form-group">
-          <label className="form-label">Address</label>
+          
           <input
             type="text"
             className="form-control"
-            placeholder="Your address"
+            placeholder="address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             required

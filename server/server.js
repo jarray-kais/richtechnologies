@@ -34,13 +34,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // Initialiser Passport
 app.use(googleAuthRoutes);
-
-
-
-
 app.use(express.json(), express.urlencoded({ extended: true }), cors());
 
-app.use(express.json(), express.urlencoded({ extended: false }), cors());
 
 app.use('/api/users', userRouter);
 app.use('/api/products', productRouter);
@@ -48,7 +43,6 @@ app.use('/api/orders', orderRouter)
 app.use('/api', FlouciRouter)
 app.use('/api/stripe',stripeRouter)
 app.use('/api/support',SupportRouter)
-
 
 app.get('/api/check-auth', isAuth, (req, res) => {
     res.json({ authenticated: true, message: 'User is authenticated' });
@@ -67,8 +61,6 @@ app.get('/api/config/paypal', (req, res) => {
 app.get('developers.flouci.com/api/generate_payment',(req , res)=>{
 
 })
-
-
 app.get('/api/config/google', (req, res) => {
     res.send(process.env.GOOGLE_API_key || 'sb');
   });

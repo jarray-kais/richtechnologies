@@ -8,7 +8,7 @@ const Product = (props) => {
   return (
     <div className="card" key={product._id}>
       <Link to={`/product/${product._id}`}>
-        <img className="image" src={"/"+product.image[0].url} alt={product.name} />
+        <img className="image" src={product.image[0].url} alt={product.name} />
       </Link>
       <div className="card-body">
         <Rating rating={product.rating} numReviews={product.numReviews} />
@@ -32,7 +32,7 @@ const Product = (props) => {
         </div>
       </div>
       <div className="seller">
-        {product.seller && product.seller.seller && product.seller.name ? (
+        {product.seller && product.seller.name ? (
           <Link to={`/seller/${product.seller._id}`}>
             {product.seller.name}
           </Link>

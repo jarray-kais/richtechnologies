@@ -958,7 +958,7 @@ textarea {
   margin: 0 auto ;
   display: flex;
   justify-content: space-between;
-  padding: 20px;
+  padding: 50px;
 }
 
 .cart-left {
@@ -1138,4 +1138,137 @@ textarea {
 
 .continue-btn {
   margin-top: 20px;
+}
+/* Mapscreen ----------------------------- */
+.full-box {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+}
+
+.map-input-box {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.map-input-box input {
+  width: 70%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px 0 0 4px;
+}
+
+.map-input-box button {
+  width: 30%;
+  padding: 10px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.map-input-box button:hover {
+  background-color: #0056b3;
+}
+/* paymentmetodScreen---------------------------------------- */
+
+
+.pay-form {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.pay-form-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.pay-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.pay-form-group + .pay-form-group{
+  margin-top: 15px;
+}
+.pay-form-group input[type="radio"] {
+  display: none;
+}
+
+.pay-form-group label {
+  display: block;
+	padding: 20px 60px;
+
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 18px;
+	font-weight: 400;
+	min-width: 250px;
+	white-space: nowrap;
+	position: relative;
+	transition: 0.4s ease-in-out 0s;
+}
+.pay-form-group label::after,
+.pay-form-group label::before {
+  content: "";
+	position: absolute;
+	border-radius: 50%;
+}
+
+.pay-form-group label::after{
+  height: 19px;
+	width: 19px;
+	border: 2px solid #616163;
+	left: 19px;
+	top: calc(50% - 12px);
+}
+.pay-form-group label::before{
+  background: #FA8232;
+	height: 20px;
+	width: 20px;
+	left: 20px;
+	top: 29.5px;
+	transform: scale(5);
+	opacity: 0;
+	visibility: hidden;
+	transition: 0.4s ease-in-out 0s;
+}
+.pay-form-group [type="radio"]:checked ~ label {
+	border-color: #FA8232;
+}
+.pay-form-group [type="radio"]:checked ~ label::before {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.pay-action-buttons {
+  text-align: center;
+}
+
+.pay-action-buttons .primary {
+  background-color: #f5a84a;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pay-action-buttons .primary:hover {
+  background-color: #ff8800;
 }

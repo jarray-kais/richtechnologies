@@ -15,7 +15,7 @@ const CarouselImage = ({ images }) => {
   return (
     <div className="carousel-container">
       <div className="carousel-main-image">
-        <img src={"/"+images[currentIndex]} alt={` ${currentIndex + 1}`} />
+        <img src={"/"+ images[currentIndex]} alt={` ${currentIndex + 1}`} />
       </div>
       <div className="carousel-thumbnails">
         <button className="carousel-arrow" onClick={prevImage}>
