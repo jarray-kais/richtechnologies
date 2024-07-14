@@ -171,7 +171,7 @@ const Header = () => {
                     Settings
                   </li>
                   </Link>
-                  <Link to="#" style={{textDecoration : "none"}}>
+                  <Link to="/" style={{textDecoration : "none"}}>
                   <li
                     className="category-item user-item"
                     onClick={signoutHandler}
