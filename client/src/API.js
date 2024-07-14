@@ -146,3 +146,11 @@ export const similarProduct = async(id )=>{
   const response = await axios.get(`/api/products/${id}/similar`)
   return response.data
 }
+
+//Route google api --------------------------------
+export const google = async()=>{
+  const response = await axios.get("/api/config/google")
+  console.log(response.data)
+  return response.data
+  
+}
