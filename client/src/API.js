@@ -154,3 +154,26 @@ export const google = async()=>{
   return response.data
   
 }
+
+//Route post placeOrder --------------------------------
+
+export const placeOrder = async(orders)=>{
+  console.log(orders)
+  const response = await axios.post(`/api/orders/`,orders)
+  return response.data
+}
+
+////Route find order --------------------------------
+
+export const findOrder = async(id)=>{
+  const response = await axios.get(`/api/orders/${id}`)
+  return response.data
+}
+//Route payment Floucy --------------------------------
+export const initiatePayment = async ({id, totalPrice}) => {
+  console.log(id)
+  console.log(totalPrice)
+ 
+  const response = await axios.post(`/api/payment/${id}`,{totalPrice} );
+  return response.data;
+};
