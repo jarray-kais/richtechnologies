@@ -36,6 +36,9 @@ function App() {
       <Route path={"/cart"} element=<CartScreen /> />
       <Route path={"/shipping"} element=<ShippingScreen /> />
       <Route path={"/payment"} element=<PaymentMethodScreen /> />
+      <Route path={"/placeorder"} element=<PlaceOrderScreen /> />
+      <Route path={"/order/:id"} element=<OrderScreen /> />
+      <Route path={"/success/:id/:payment_id"} element=<SuccessScreen /> />
       <Route path={"/map"} element={<Auth><MapScreen /></Auth>} />
       <Route path={"product/:id"} element=<ProductdetailsScreen /> />
       <Route path={"/profile"} element={<Auth><ProfileScreen/></Auth>} exact/>
