@@ -12,14 +12,11 @@ import Product from "../components/featuredProduct/Product";
 const ProductdetailsScreen = () => {
   const { id } = useParams();
   const { state, dispatch: ctxDispatch } = useContext(Store);
-  const { cart, userInfo } = state;
+  const { userInfo } = state;
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
-  const [review, setReview] = useState({
-    comment: "",
-    rating: 0,
-  });
+  const [review, setReview] = useState({ comment: "", rating: 0 });
   const {
     data: productdetail,
     isLoading: loadingproductdetails,
