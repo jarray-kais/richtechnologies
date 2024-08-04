@@ -9,8 +9,17 @@ import BackButton from '../components/BackButton/BackButton';
 const PaymentMethodScreen = () => {
   const navigate = useNavigate();
   const { state, dispatch: ctxDispatch } = useContext(Store);
-  const { paymentMethod } = state;
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(paymentMethod || 'Cash on Delivery');
+  const {
+    cart: { shippingAddress, paymentMethod },
+  } = state;
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+
+
+  useEffect(() => {
+    if (!shippingAddress.address) {
+      navigate('/shipping');
+    }
+  }, [shippingAddress, navigate]);
 
   const submitHandler = (e) => {
     e.preventDefault();
