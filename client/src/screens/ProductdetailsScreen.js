@@ -145,7 +145,7 @@ const ProductdetailsScreen = () => {
                   </p>
                 )}
                 <p>Brand: {productdetail?.brand}</p>
-                <p>Category: {productdetail?.category.sub}</p>
+                <p>Category: {productdetail?.category.main} /{productdetail?.category.sub}</p>
               </div>
               <div className="horizontal-line"></div>
               <div className="description">{productdetail?.description}</div>
