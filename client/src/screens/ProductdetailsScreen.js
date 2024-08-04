@@ -92,8 +92,9 @@ const ProductdetailsScreen = () => {
       payload: { ...productdetail, quantity },
     });
     navigate("/cart");
-  };
- console.log(similarproduct)
+  }, [productdetail, quantity, ctxDispatch, navigate]);
+  
+
   return (
     <div className="productdetailscreen">
       {loadingproductdetails ? (
