@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-const CarouselImage = ({ images }) => {
+const CarouselImage = React.memo(({ images }) => {
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const nextImage = () => {
