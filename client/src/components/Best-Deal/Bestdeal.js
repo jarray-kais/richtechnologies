@@ -24,6 +24,8 @@ const Bestdeal = () => {
   const overlay = useRef(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [showCarousel, setShowCarousel] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const { dispatch: ctxDispatch } = useContext(Store);
 
   const handleClickOutside = (event) => {
     if (overlay.current && !overlay.current.contains(event.target)) {
