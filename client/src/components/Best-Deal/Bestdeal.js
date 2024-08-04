@@ -143,9 +143,8 @@ const addToCartHandler = () => {
                 </span>
               </div>
 
-              <p>
-                Games built using the Xbox Series X|S development kit showcase
-                unparalleled load times, visuals.s
+              <p className="description">
+              {currentDeal?.description}
               </p>
             </div>
             <div className="product-left-button">
