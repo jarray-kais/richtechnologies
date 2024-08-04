@@ -152,7 +152,7 @@ const ProductdetailsScreen = () => {
               <div className="product-actions">
                 <div className="quantity-selector">
                   <button
-                    className="quantity-button"
+                   className="quantity-button"
                     onClick={() => UpdateCartHandler(productdetail, quantity - 1)}
                     disabled={quantity === 1}
                   >
