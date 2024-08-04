@@ -71,7 +71,7 @@ const Accessoires = () => {
                   key="Browse"
                   onClick={() => handleSubCategoryClick("")}
                   className={`subcategory-item ${subCategory === "" ? "active" : ""}`}
-                ><Link to={`/search?query=${mainCategory}`} style={{textDecoration : "none"}}>
+                ><Link to={`/search?${mainCategory}`} style={{textDecoration : "none"}}>
                   Browse All Product{" "}
                   <i className="fa fa-long-arrow-right" aria-hidden="true"></i>
                 
