@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './CheckoutSteps.css';
 
 export default function CheckoutSteps(props) {
