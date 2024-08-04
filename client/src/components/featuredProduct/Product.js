@@ -1,7 +1,24 @@
 import Rating from "./Rating";
 import { Link } from "react-router-dom";
 
-const Product = (props) => {
+const Product = ({ imageUrls, altText }) => {
+  const imageUrl = imageUrls && imageUrls[0] ? imageUrls[0].url : null;
+
+  // Vérifie si l'URL commence par "http" ou "https"
+  const isAbsoluteUrl =
+    imageUrl &&
+    (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"));
+
+  return (
+    <img
+      className="image"
+      src={isAbsoluteUrl ? imageUrl : `/${imageUrl}`} // Ajoute un "/" seulement si ce n'est pas une URL absolue
+      alt={altText}
+    />
+  );
+};
+
+const Product = React.memo((props) => {
   const { product } = props;
   console.log(product);
 
