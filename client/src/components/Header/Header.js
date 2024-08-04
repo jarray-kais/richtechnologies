@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import DropdownCategory from "./DropdownCategory";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Store } from "../../Context/CartContext";
+import SearchBar from "./SearchBar";
 
 const Header = () => {
   const dropdownRef = useRef(null);
