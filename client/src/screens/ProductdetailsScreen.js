@@ -114,15 +114,20 @@ const ProductdetailsScreen = () => {
             <div className="productDetail-right">
               <h2>{productdetail?.name}</h2>
               <div className="row">
-                <span className="price">{productdetail?.price} TND</span>
-                {productdetail?.promotion?.discountedPrice && (
-                  <div className="old-price">
-                    <span className="price-section">
-                      {productdetail.promotion.discountedPrice} TND
-                    </span>
-                  </div>
-                )}
+          {productdetail.promotion && productdetail.promotion.discountedPrice ? (
+            <>
+              <div className="old-price ">
+                <span className="price-section ">{productdetail.price} TND</span>
               </div>
+
+              <span className="price">
+                {productdetail.promotion.discountedPrice} TND
+              </span>
+            </>
+          ) : (
+            <span className="price">{productdetail.price} TND</span>
+          )}
+        </div>
               <Rating
                 rating={productdetail?.rating}
                 numReviews={productdetail?.numReviews}
