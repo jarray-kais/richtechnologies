@@ -29,21 +29,19 @@ const ProductdetailsScreen = () => {
   });
 
   const {
-    data : similarproduct ,
-    isLoading : similarLoading,
-    error : similarError,
+    data: similarproduct,
+    isLoading: similarLoading,
+    error: similarError,
   } = useQuery({
     queryKey: ["similar", id],
     queryFn: () => similarProduct(id),
     refetchOnWindowFocus: false,
     retry: 2,
-  })
+  });
 
   const mutation = useMutation({
     mutationFn: postReview,
-    onSuccess: () => {
-      window.alert("success")
-    },
+    onSuccess: () => window.alert("Review posted successfully!"),
     onError: (error) => {
       const errorMessage =
         error.response?.data?.message || error.message || "An error occurred";
