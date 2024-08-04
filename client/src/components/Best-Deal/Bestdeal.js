@@ -98,6 +98,18 @@ const Bestdeal = () => {
 
   const groupedProducts = groupProducts(dealproduct, 6);
   const imageUrls = currentDeal.image.map((img) => img.url);
+const addToCartHandler = () => {
+    if (currentDeal.countInStock < quantity) {
+      window.alert("Sorry, we don't have enough stock.");
+      return;
+    }
+    ctxDispatch({
+      type: "CART_ADD_ITEM",
+      payload: { ...currentDeal, quantity },
+    });
+  };
+
+
   return (
     <div className="main-deal">
       <div className="deal-text">
