@@ -19,6 +19,7 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import "swiper/css/effect-coverflow";
 import CarouselImage from "./Carousel";
+import { Store } from "../../Context/CartContext";
 const Bestdeal = () => {
   const overlay = useRef(null);
   const [showOverlay, setShowOverlay] = useState(false);
