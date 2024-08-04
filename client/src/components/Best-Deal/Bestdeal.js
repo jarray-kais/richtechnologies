@@ -149,7 +149,7 @@ const addToCartHandler = () => {
               </p>
             </div>
             <div className="product-left-button">
-              <button className="add-to-card-button">ADD TO CARD</button>
+              <button className="add-to-card-button" onClick={addToCartHandler}>ADD TO CARD</button>
 
               <button
                 className="eye-button"
