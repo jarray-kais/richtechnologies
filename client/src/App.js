@@ -40,7 +40,7 @@ function App() {
       <Route path={"/payment"} element=<PaymentMethodScreen /> />
       <Route path={"/placeorder"} element=<PlaceOrderScreen /> />
       <Route path={"/order/:id"} element=<OrderScreen /> />
-      <Route path={"/success/:id/:payment_id"} element=<SuccessScreen /> />
+      <Route path={"/success/:id?"} element=<SuccessScreen /> />
 <Route path={"/:id/cashpay"} element=<CashPayDelevery /> />
       <Route path={"/fail"} element=<FailScreen /> />
       <Route path={"/map"} element={<Auth><MapScreen /></Auth>} />
