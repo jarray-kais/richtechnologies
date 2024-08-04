@@ -73,10 +73,7 @@ const Header = () => {
       </div>
       <div className="col2">
         <DropdownCategory />
-        <div className="search-bar">
-          <input type="text" placeholder="Search product ..." />
-          <img src="/images/search.svg" alt="search" className="search-icon" />
-        </div>
+        <SearchBar />
         <div className="user-actions">
           {userInfo ? (
             <div className="all-categories" ref={dropdownRef}>
