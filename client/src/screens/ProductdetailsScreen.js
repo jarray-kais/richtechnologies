@@ -73,10 +73,17 @@ const ProductdetailsScreen = () => {
 
   const imageUrls = productdetail?.image?.map((img) => img.url);
 
-  const addToCartHandler = async () => {
-    const existItem = cart.cartItems.find((x) => x._id === productdetail._id);
-    const updatedQuantity = existItem ? existItem.quantity + 1 : 1;
-    if (productdetail?.countInStock < updatedQuantity) {
+  const UpdateCartHandler = useCallback(async (item, newQuantity) => {
+    const { data: product } = await findproduct(item._id);
+    if (product && product.countInStock < newQuantity) {
+      window.alert('Sorry. Product is out of stock');
+      return;
+    }
+    setQuantity(newQuantity);
+  }, []);
+
+  const addToCartHandler = useCallback(async () => {
+    if (productdetail?.countInStock < quantity) {
       window.alert("Sorry. Product is out of stock");
       return;
     }
