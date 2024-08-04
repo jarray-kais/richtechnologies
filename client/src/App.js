@@ -20,6 +20,8 @@ import PaymentMethodScreen from "./screens/PaymentMethodScreen";
 import PlaceOrderScreen from "./screens/PlaceOrderScreen";
 import OrderScreen from "./screens/OrderScreen";
 import SuccessScreen from "./screens/SuccessScreen";
+import FailScreen from "./screens/FailScreen";
+import CashPayDelevery from "./screens/CashPayDelevery";
 
 
 
