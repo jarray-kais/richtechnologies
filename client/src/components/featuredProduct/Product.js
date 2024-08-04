@@ -1,7 +1,8 @@
+import React from "react";
 import Rating from "./Rating";
 import { Link } from "react-router-dom";
 
-const Product = ({ imageUrls, altText }) => {
+const ProductImage = ({ imageUrls, altText }) => {
   const imageUrl = imageUrls && imageUrls[0] ? imageUrls[0].url : null;
 
   // Vérifie si l'URL commence par "http" ou "https"
@@ -20,12 +21,10 @@ const Product = ({ imageUrls, altText }) => {
 
 const Product = React.memo((props) => {
   const { product } = props;
-  console.log(product);
-
   return (
     <div className="card" key={product._id}>
       <Link to={`/product/${product._id}`}>
-        <img className="image" src={product.image[0].url} alt={product.name} />
+        <ProductImage imageUrls={product.image} altText={product.name} />
       </Link>
       <div className="card-body">
         <Rating rating={product.rating} numReviews={product.numReviews} />
@@ -35,17 +34,19 @@ const Product = React.memo((props) => {
         </Link>
 
         <div className="row">
-        <span className="price">{product.price} TND</span>
-          <div className="old-price ">
-          
-            {product.promotion && product.promotion.discountedPrice ? (
-              <span className="price-section ">
+          {product.promotion && product.promotion.discountedPrice ? (
+            <>
+              <div className="old-price ">
+                <span className="price-section ">{product.price} TND</span>
+              </div>
+
+              <span className="price">
                 {product.promotion.discountedPrice} TND
               </span>
-            ) : null}
-
-            
-          </div>
+            </>
+          ) : (
+            <span className="price">{product.price} TND</span>
+          )}
         </div>
       </div>
       <div className="seller">
@@ -57,6 +58,6 @@ const Product = React.memo((props) => {
       </div>
     </div>
   );
-};
+});
 
 export default Product;
