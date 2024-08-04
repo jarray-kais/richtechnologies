@@ -49,12 +49,14 @@ const ProductdetailsScreen = () => {
     },
   });
 
- 
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      mutation.mutate({ review, id });
+    },
+    [review, id, mutation]
+  );
 
-  const handleSubmit = useCallback((e) => {
-    e.preventDefault();
-    mutation.mutate({review , id});
-  },[review, id , mutation]) ;
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setReview((prevReview) => ({
