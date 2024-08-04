@@ -153,11 +153,8 @@ const ProductdetailsScreen = () => {
                 <div className="quantity-selector">
                   <button
                     className="quantity-button"
-                    onClick={() =>
-                      setQuantity((prevQuantity) =>
-                        prevQuantity > 1 ? prevQuantity - 1 : 1
-                      )
-                    }
+                    onClick={() => UpdateCartHandler(productdetail, quantity - 1)}
+                    disabled={quantity === 1}
                   >
                     -
                   </button>
