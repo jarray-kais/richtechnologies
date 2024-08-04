@@ -16,6 +16,7 @@ export const signIn = async (credentials) => {
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log(formData)
     return response.data;
   };
   //Route signup seller --------------------------------
@@ -81,6 +82,7 @@ export const findproduct = async (id) => {
 //Route Brand ------------------------------------------------------------
 export const fetchbrand = async(category)=>{
   const encodecategory = encodeURIComponent(category)
+  console.log(encodecategory)
   const response = await axios.get(`/api/products/brand?mainCategory=${encodecategory}`)
   return response.data;
 }
@@ -128,7 +130,7 @@ export const accessoires = async( mainCategory , subCategory)=>{
 //Route search --------------------------------
 
 export const search = async(query , page )=>{
-const url= decodeURIComponent(query).toLocaleLowerCase();
+  const url= decodeURIComponent(query).toLocaleLowerCase();
 
   const response = await axios.get(`/api/products/search?query=${url}&page=${page}`)
   return response.data
@@ -141,10 +143,9 @@ export const suggestions = async(query )=>{
   return response.data
 }
 
+
 //Route post review --------------------------------
 export const postReview = async({review , id })=>{
-  console.log(id)
-  console.log(review)
   const response = await axios.post(`/api/products/${id}/review`,review)
   return response.data
 }
@@ -158,7 +159,6 @@ export const similarProduct = async(id )=>{
 //Route google api --------------------------------
 export const google = async()=>{
   const response = await axios.get("/api/config/google")
-  console.log(response.data)
   return response.data
   
 }
@@ -166,7 +166,6 @@ export const google = async()=>{
 //Route post placeOrder --------------------------------
 
 export const placeOrder = async(orders)=>{
-  console.log(orders)
   const response = await axios.post(`/api/orders/`,orders)
   return response.data
 }
@@ -179,9 +178,29 @@ export const findOrder = async(id)=>{
 }
 //Route payment Floucy --------------------------------
 export const initiatePayment = async ({id, totalPrice}) => {
-  console.log(id)
-  console.log(totalPrice)
+
  
   const response = await axios.post(`/api/payment/${id}`,{totalPrice} );
   return response.data;
 };
+
+//Route verify payment flouci --------------------------------
+export const verifyPayment = async({id , payment_id})=>{
+  const response = await axios.post(`/api/verify/${id}/${payment_id}`)
+  return response.data;
+}
+
+//Route post cash payment --------------------------------
+
+export const sendcashPayment = async(id)=>{
+  const response = await axios.post(`/api/orders/${id}/cashpay`)
+  return response.data;
+}
+
+
+//Route cash payment --------------------------------
+export const cashPayment = async(id)=>{
+  console.log(id)
+  const response = await axios.get(`/api/orders/${id}/cashpay`)
+  return response.data;
+}
