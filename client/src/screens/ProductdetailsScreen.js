@@ -89,7 +89,7 @@ const ProductdetailsScreen = () => {
     }
     ctxDispatch({
       type: "CART_ADD_ITEM",
-      payload: { ...productdetail, quantity: updatedQuantity },
+      payload: { ...productdetail, quantity },
     });
     navigate("/cart");
   };
