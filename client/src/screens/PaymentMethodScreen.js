@@ -1,5 +1,5 @@
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Store } from '../Context/CartContext';
 import CheckoutSteps from '../components/Chekout/CheckoutSteps';
