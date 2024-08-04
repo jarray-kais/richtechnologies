@@ -5,7 +5,7 @@ import Prorductdeal from "./Prorductdeal";
 import Loading from "../Loading/Loading";
 import Rating from "../featuredProduct/Rating";
 import Message from "../Message/Message";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
   Pagination,
