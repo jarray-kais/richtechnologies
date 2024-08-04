@@ -172,6 +172,7 @@
 .product-deal{
   display: flex;
   justify-content: center;
+  gap: 100px;
   width: 100%;
 
 }

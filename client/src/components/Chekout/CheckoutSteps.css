@@ -1,28 +1,21 @@
-
 .checkout-steps {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  
-  .step {
-    padding: 10px 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f8f8f8;
-    color: #888;
-    flex: 1;
-    text-align: center;
-    margin-right: 5px;
-  }
-  
-  .step.active {
-    background-color: #FA8232;
-    color: #fff;
-    border-color: #FA8232;
-  }
-  
-  .step:last-child {
-    margin-right: 0;
-  }
-  
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.step {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  border-bottom: 2px solid #ddd;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.step.active {
+  border-bottom: 2px solid #FA8232;
+  color: #FA8232;
+  cursor: pointer; 
+  text-decoration: none;
+}
