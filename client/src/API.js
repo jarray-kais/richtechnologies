@@ -128,8 +128,16 @@ export const accessoires = async( mainCategory , subCategory)=>{
 //Route search --------------------------------
 
 export const search = async(query , page )=>{
-  const response = await axios.get(`/api/products/search?query=${query}&page=${page}`)
-  console.log(query)
+const url= decodeURIComponent(query).toLocaleLowerCase();
+
+  const response = await axios.get(`/api/products/search?query=${url}&page=${page}`)
+  return response.data
+}
+
+//Route suggestions --------------------------------
+
+export const suggestions = async(query )=>{
+  const response = await axios.get(`/api/products/suggest?query=${query}`)
   return response.data
 }
 
