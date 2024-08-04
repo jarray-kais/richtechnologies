@@ -161,9 +161,8 @@ const ProductdetailsScreen = () => {
                   <span className="quantity-display">{quantity}</span>
                   <button
                     className="quantity-button"
-                    onClick={() =>
-                      setQuantity((prevQuantity) => prevQuantity + 1)
-                    }
+                    onClick={() => UpdateCartHandler(productdetail, quantity + 1)}
+                    disabled={quantity === productdetail.countInStock}
                   >
                     +
                   </button>
