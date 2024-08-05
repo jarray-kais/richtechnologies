@@ -29,20 +29,20 @@ const SignupScreen = () => {
   })
 
   const handleChange = (e) => {
-    const {name , value , files} = e.target
-    if(name === 'profilePicture'){
+    const { name, value, files } = e.target;
+    if (name === 'profilePicture') {
       setFormData({
-       ...formData,
+        ...formData,
         profilePicture: files[0]
-      })
-    }
-    else {
+      });
+      setFileName(files[0].name);
+    } else {
       setFormData({
-     ...formData,
-      [name]: value
-    })
-  }
-  }
+        ...formData,
+        [name]: value
+      });
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault()

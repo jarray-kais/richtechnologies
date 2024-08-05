@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { maincategory, fetchbrand, search } from "../API";
 import Loading from "../components/Loading/Loading";
 import Message from "../components/Message/Message";
