@@ -69,14 +69,14 @@ productRouter.get(
     res.send(brands);
   })
 );
- //Route pour obtenir les main-catégories
- productRouter.get(
-  "/maincategories",
-  expressAsyncHandler(async (req, res) => {
-    const mainCategories = await Product.distinct("category.main");
+//Route pour obtenir les main-catégories
+productRouter.get(
+ "/maincategories",
+ expressAsyncHandler(async (req, res) => {
+   const mainCategories = await Product.distinct("category.main");
 
-    res.send(mainCategories);
-  })
+   res.send(mainCategories);
+ })
 );
 //Route pour obtenir les sous-catégories d'une catégorie spécifique
 productRouter.get(
@@ -122,9 +122,10 @@ productRouter.get(
     }
   })
 );
-//Route of search
+//Route to handle search
+
 productRouter.get(
-  "/search",
+  '/search',
   expressAsyncHandler(async (req, res) => {
     const {
       query,
@@ -133,32 +134,34 @@ productRouter.get(
       minPrice,
       maxPrice,
       page = 1,
-      pageSize = 3,
+      pageSize = 16,
     } = req.query;
 
+
     if (!query) {
-      res.status(400).send({ message: "Query parameter is required" });
-      return;
+      return res.status(400).send({ message: 'Query parameter is required' });
     }
-    const from = (page - 1) * pageSize; // Calculate the starting index
+
+    const from = (page - 1) * pageSize;
+
     try {
       const searchParams = {
-        index: "ecommerce",
+        index: 'ecommerce',
         body: {
           query: {
             bool: {
               must: [
                 {
                   multi_match: {
-                    query: query,
+                    query,
                     fields: [
-                      "name^3", // Boost the name field
-                      "description",
-                      "brand^2", // Boost the brand field
-                      "category.main",
-                      "category.sub",
+                      'name^1',
+                      'description',
+                      'brand^3',
+                      'category.main^2',
+                      'category.sub^2',
                     ],
-                    fuzziness: "AUTO", // Allow typos
+                    fuzziness: 'AUTO',
                   },
                 },
               ],
@@ -170,68 +173,164 @@ productRouter.get(
               name: {},
               description: {},
               brand: {},
-              "category.main": {},
-              "category.sub": {},
+              'category.main': {},
+              'category.sub': {},
             },
           },
-          from: from, // Pagination start
-          size: parseInt(pageSize), // Number of results per page
+          from,
+          size: parseInt(pageSize, 10),
         },
       };
 
-      // Adding category filter if provided
       if (category) {
+        const categoryList = category.split(','); 
         searchParams.body.query.bool.filter.push({
-          term: { "category.main": category },
+          bool: {
+            should: categoryList.map((category) => ({
+              bool: {
+                should: [
+                  { term: { "category.main": category } },
+                  { term: { "category.sub": category } }
+                ]
+              }
+            }))
+          }
         });
       }
-
-      // Adding brand filter if provided
       if (brand) {
+        const  brandList = brand.split(',');
         searchParams.body.query.bool.filter.push({
-          term: { brand: brand },
+          bool: {
+            should: brandList.map((brand) => ({
+              term: { brand: brand }
+            }))
+          }
         });
       }
 
-      // Adding price range filter if provided
       if (minPrice || maxPrice) {
         const priceFilter = {};
         if (minPrice) priceFilter.gte = minPrice;
         if (maxPrice) priceFilter.lte = maxPrice;
         searchParams.body.query.bool.filter.push({
-          range: { price: priceFilter },
+          bool: {
+            should: [
+              { range: { price: priceFilter } },
+              { range: { 'promotion.discountedPrice': priceFilter } },
+            ],
+          },
         });
       }
 
       const searchResult = await client.search(searchParams);
       const hits = searchResult.hits.hits;
-      const ids = hits.map((hit) => hit._id);
+      const ids = hits.map(hit => hit._id);
       const products = await Product.find({ _id: { $in: ids } });
-      //accéder rapidement aux documents par leur identifiant
+
       const productMap = {};
       products.forEach((product) => {
         productMap[product._id] = product;
       });
 
-      const searchResultsWithFullDocuments = hits.map((hit) => {
-        const productId = hit._id;
-        const fullDocument = productMap[productId];
-        return {
-          ...hit,
-          fullDocument,
-        };
-      });
+      const searchResultsWithFullDocuments = hits.map(hit => ({
+        ...hit,
+        fullDocument: productMap[hit._id],
+      }));
+
       res.send({
         results: searchResultsWithFullDocuments,
-        page: parseInt(page),
-        pageSize: parseInt(pageSize),
+        page: parseInt(page, 10),
+        pageSize: parseInt(pageSize, 10),
       });
     } catch (error) {
-      console.error(error);
-      res.status(500).send({ message: "Error searching products" });
+      console.error('Error searching products:', error);
+      res.status(500).send({ message: 'Error searching products' });
     }
   })
 );
+// Route to handle suggestions
+productRouter.get('/suggest', expressAsyncHandler(async (req, res) => {
+  let { query } = req.query;
+  console.log('Query:', query);
+
+  if (typeof query !== 'string') {
+    return res.status(400).send({ message: 'Query parameter must be a string' });
+  }
+
+
+  query = query.toLowerCase();
+  const mappings = await client.indices.getMapping({ index: 'ecommerce_suggest' });
+console.log('Index Mappings:', mappings);
+
+
+    // Search Elasticsearch
+    const result = await client.search({
+      index: 'ecommerce_suggest',
+      body: {
+        suggest: {
+          name_suggestion: {
+            prefix: query,
+            completion: {
+              field: 'name.suggest'
+            }
+          },
+          description_suggestion: {
+            prefix: query,
+            completion: {
+              field: 'description.suggest'
+            }
+          },
+          main_suggestion: {
+            prefix: query,
+            completion: {
+              field: 'category.main.suggest'
+            }
+          },
+          sub_suggestion: {
+            prefix: query,
+            completion: {
+              field: 'category.sub.suggest'
+            }
+          },
+          brand_suggestion: {
+            prefix: query,
+            completion: {
+              field: 'brand.suggest' 
+            }
+          }
+        }
+      }
+    });
+
+    // Log the entire result object
+    console.log('Elasticsearch Result:', result.suggest);
+
+    // Log the suggest section
+    const suggestSection = result.suggest || {};
+    console.log('Suggest Section:', suggestSection);
+
+    // Extract suggestions
+    const suggestions = {
+      name: (suggestSection.name_suggestion?.[0]?.options?.map(option => option.text) || []),
+      description: (suggestSection.description_suggestion?.[0]?.options?.map(option => option.text) || []),
+      description: (suggestSection.description_suggestion?.[0]?.options?.map(option => option.text) || []),
+      brand: (suggestSection.brand_suggestion?.[0]?.options?.map(option => option.text) || []),
+      main: (suggestSection.main_suggestion?.[0]?.options?.map(option => option.text) || []),
+      sub: (suggestSection.sub_suggestion?.[0]?.options?.map(option => option.text) || []),
+    };
+
+    console.log('Extracted Suggestions:', suggestions);
+
+    res.json(suggestions);
+  
+}));
+
+
+
+
+
+
+
 //route find deal products
 productRouter.get(
   "/deal",
@@ -317,7 +416,7 @@ productRouter.get(
     res.send(featuredProducts);
   })
 );
- 
+
 //product of seller
 productRouter.get(
   "/:id/seller",
@@ -405,7 +504,7 @@ productRouter.get(
 
     res.send(products);
   })
-);  
+);
 
 
 
