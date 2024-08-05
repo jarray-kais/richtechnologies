@@ -13,7 +13,6 @@ const Forgetpassword = () => {
   const mutation = useMutation({
     mutationFn: forgetPassword,
     onSuccess: (data) => {
-      console.log(data);
       setEmail("");
       setIsLoading(false);
       setIsSuccess(true);

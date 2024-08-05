@@ -38,6 +38,6 @@ const CarouselImage = React.memo(({ images }) => {
       </div>
     </div>
   );
-};
+});
 
 export default CarouselImage;
