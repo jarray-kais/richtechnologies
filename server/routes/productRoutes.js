@@ -744,20 +744,26 @@ productRouter.delete(
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (product) {
-      if (product.image && product.image.length > 0) {
-        product.image.forEach((image) => {
-          fs.unlink(image.url, (err) => {
-            if (err) {
-              console.error(`Error deleting ${image.url}:`, err);
-            } else {
-              console.log(`Successfully deleted ${image.url}`);
-            }
+      // Check if the user is the owner of the product or an admin
+      if (req.user.isAdmin || product.seller.toString() === req.user._id.toString()) {
+        // Delete associated images if they exist
+        if (product.image && product.image.length > 0) {
+          product.image.forEach((image) => {
+            fs.unlink(image.url, (err) => {
+              if (err) {
+                console.error(`Error deleting ${image.url}:`, err);
+              } else {
+                console.log(`Successfully deleted ${image.url}`);
+              }
+            });
           });
-        });
-      }
+        }
 
-      const deleteProduct = await product.deleteOne();
-      res.send({ message: "Product Deleted", product: deleteProduct });
+        const deleteProduct = await product.deleteOne();
+        res.send({ message: "Product Deleted", product: deleteProduct });
+      } else {
+        res.status(403).send({ message: "Unauthorized: You can only delete your own products." });
+      }
     } else {
       res.status(404).send({ message: "Product Not Found" });
     }
