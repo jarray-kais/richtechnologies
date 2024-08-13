@@ -389,16 +389,20 @@ productRouter.get(
   isAuth,
   expressAsyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 4;
+    const limit = parseInt(req.query.limit) || 16;
     const startIndex = (page - 1) * limit;
     const userId = req.user._id;
-    console.log(userId);
-    const history = await Product.find({ "viewedProduct.user": userId })
-      .select("name image rating numReviews viewedProduct")
-      .populate({ path: "viewedProduct.user", select: "viewedAt" })
+    
+    const totalcount = await Product.countDocuments({ "viewedProduct.user": userId })
+    const history = await Product.find({ "viewedProduct.user": userId }).sort({ "viewedProduct.viewedAt": -1 })
       .skip(startIndex)
-      .limit(limit);
-    res.send(history);
+      .limit(limit)
+      .populate({
+        path: "viewedProduct.user",
+        match: { _id: userId },
+        select: "viewedAt"
+      });;
+    res.send({history ,totalcount});
   })
 );
 //router featured products
