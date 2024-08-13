@@ -372,12 +372,12 @@ productRouter.get(
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit);
     const startIndex = (page - 1) * limit;
-
-    // Récupération des produits pour la page donnée
-    const products = await Product.find().skip(startIndex).limit(limit);
+    const totalCount = await Product.countDocuments()
+    const products = await Product.find().skip(startIndex).skip(startIndex)
+    .limit(limit);
 
     if (products) {
-      res.send(products);
+      res.send({products , totalCount});
     } else {
       res.status(404).send({ message: "Products Not Found" });
     }
