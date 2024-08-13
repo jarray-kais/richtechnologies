@@ -28,7 +28,7 @@ userRouter.get(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
+    const limit = parseInt(req.query.limit) || 7;
     const startIndex = (page - 1) * limit;
     const users = await User.find({}).skip(startIndex)
     .limit(limit);
