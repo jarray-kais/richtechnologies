@@ -30,9 +30,10 @@ userRouter.get(
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 7;
     const startIndex = (page - 1) * limit;
+    const totalCount = await User.countDocuments({});
     const users = await User.find({}).skip(startIndex)
     .limit(limit);
-    res.send(users);
+    res.send({users , totalCount});
   })
 );
 userRouter.get(
