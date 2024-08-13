@@ -618,6 +618,21 @@ productRouter.post(
       product.reviews.reduce((a, c) => c.rating + a, 0) /
       product.reviews.length; 
 
+    
+
+    const seller = await User.findById(product.seller._id);
+    if (seller && seller.isSeller) {
+      const products = await Product.find({ 'seller': seller._id });
+      
+      const totalRatings = products.reduce((sum, p) => sum + p.rating * p.numReviews, 0);
+      const totalReviews = products.reduce((sum, p) => sum + p.numReviews, 0);
+
+      seller.seller.rating = totalRatings / totalReviews || 0; // éviter la division par zéro
+      seller.seller.numReviews = totalReviews;
+     
+
+      await seller.save();
+    }
     const updatedProduct = await product.save();
     res.status(201).send(updatedProduct);
   })
