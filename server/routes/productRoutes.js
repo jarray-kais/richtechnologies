@@ -4,6 +4,7 @@ import cron from "node-cron";
 import { isAdmin, isAuth, isSellerOrAdmin } from "../utils.js";
 import { upload } from "./uploadRouter.js";
 import Product from "../models/ProductModel.js";
+import User from "../models/userModel.js";
 import dotenv from "dotenv";
 import { Client } from "@elastic/elasticsearch-serverless";
 import fs from "fs";
@@ -58,7 +59,6 @@ productRouter.get(
     let brands ;
     if(mainCategory) {
       const decodedMainCategory = decodeURIComponent(mainCategory);
-      console.log(decodedMainCategory);
     brands = await Product.distinct("brand", {
       "category.main": decodedMainCategory,
     });
@@ -89,7 +89,7 @@ productRouter.get(
 
     const subCategories = await Product.distinct("category.sub", {
       "category.main": mainCategory,
-    });
+    }).populate("seller", "name");
     res.send(subCategories);
   })
 );
@@ -105,7 +105,8 @@ productRouter.get(
       // Si subCategory n'est pas défini, retourner les sous-catégories
       const mainCategoryProduct = await Product.find({
         "category.main": mainCategory,
-      }).sort({ rating: -1 })
+      }).populate("seller", "name")
+      .sort({ rating: -1 })
       .skip(startIndex)
       .limit(limit);
       res.send(mainCategoryProduct);
@@ -114,7 +115,7 @@ productRouter.get(
       const products = await Product.find({
         "category.main": mainCategory,
         "category.sub": subCategory,
-      })
+      }).populate("seller", "name")
         .sort({ rating: -1 })
         .skip(startIndex)
         .limit(limit);
@@ -225,7 +226,7 @@ productRouter.get(
       const searchResult = await client.search(searchParams);
       const hits = searchResult.hits.hits;
       const ids = hits.map(hit => hit._id);
-      const products = await Product.find({ _id: { $in: ids } });
+      const products = await Product.find({ _id: { $in: ids } }).populate("seller", "name");
 
       const productMap = {};
       products.forEach((product) => {
@@ -307,7 +308,7 @@ console.log('Index Mappings:', mappings);
 
     // Log the suggest section
     const suggestSection = result.suggest || {};
-    console.log('Suggest Section:', suggestSection);
+ 
 
     // Extract suggestions
     const suggestions = {
@@ -319,7 +320,7 @@ console.log('Index Mappings:', mappings);
       sub: (suggestSection.sub_suggestion?.[0]?.options?.map(option => option.text) || []),
     };
 
-    console.log('Extracted Suggestions:', suggestions);
+   
 
     res.json(suggestions);
   
@@ -369,8 +370,7 @@ productRouter.get(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    // Calcul de l'index de début
+    const limit = parseInt(req.query.limit);
     const startIndex = (page - 1) * limit;
 
     // Récupération des produits pour la page donnée
