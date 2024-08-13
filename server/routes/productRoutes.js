@@ -421,6 +421,15 @@ productRouter.get(
   })
 );
 
+//seller get  products
+productRouter.get('/seller', isAuth , isSellerOrAdmin , expressAsyncHandler(async (req, res) => {
+
+  const totalproducts = await Product.countDocuments({seller : req.user._id})
+  const products = await Product.find({seller : req.user._id})
+  res.send({products , totalproducts})
+
+}))
+
 //product of seller
 productRouter.get(
   "/:id/seller",
