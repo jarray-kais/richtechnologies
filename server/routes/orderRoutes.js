@@ -8,6 +8,15 @@ import nodemailer from 'nodemailer';
 
 const orderRouter =express.Router()
 
+orderRouter.get(
+  "/seed",
+  expressAsyncHandler(async (req, res) => {
+    const createdorder = await Order.insertMany(data.products);
+    res.send({ createdorder });
+  })
+);
+
+
 //Fetches summary data for orders, users, and products.
 orderRouter.get(
   '/summary',

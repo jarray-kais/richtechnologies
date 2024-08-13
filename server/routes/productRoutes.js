@@ -51,6 +51,14 @@ cron.schedule("0 0 * * *", async () => {
   }
 });
 
+productRouter.get(
+  "/seed",
+  expressAsyncHandler(async (req, res) => {
+    const createdProducts = await Product.insertMany(data.products);
+    res.send({ createdProducts });
+  })
+);
+
 //Route pour obtenir les brand de chaque maincategory
 productRouter.get(
   "/brand",

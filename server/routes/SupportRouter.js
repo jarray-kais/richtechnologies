@@ -6,6 +6,15 @@ import { isAdmin, isAuth } from '../utils.js'
 
 const SupportRouter = express.Router()
 
+SupportRouter.get(
+    "/seed",
+    expressAsyncHandler(async (req, res) => {
+      const createdconversations = await Conversation.insertMany(data.conversations);
+      res.send({ createdconversations });
+    })
+  );
+  
+
 SupportRouter.get('/' , isAuth , isAdmin , expressAsyncHandler(async(req , res)=>{
     const conversations = await Conversation.find();
 
