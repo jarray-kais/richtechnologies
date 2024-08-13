@@ -36,6 +36,16 @@ userRouter.get(
     res.send({users , totalCount});
   })
 );
+
+// Route pour obtenir les informations d'un vendeur
+userRouter.get('/seller', isAuth , isSeller , expressAsyncHandler(async (req, res) => {
+  const seller = await User.findById(req.user._id);
+  if (!seller || !seller.isSeller) {
+    return res.status(404).send({ message: 'Seller not found' });
+  }
+  console.log(seller)
+  res.send(seller);
+}))
 userRouter.get(
   '/top-sellers',
   expressAsyncHandler(async (req, res) => {
