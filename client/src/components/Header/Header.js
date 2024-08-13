@@ -4,6 +4,8 @@ import DropdownCategory from "./DropdownCategory";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Store } from "../../Context/CartContext";
 import SearchBar from "./SearchBar";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "../../API";
 
 const Header = () => {
   const dropdownRef = useRef(null);
@@ -30,11 +32,27 @@ const Header = () => {
     };
   }, []);
 
-  const signoutHandler = () => {
-    ctxDispatch({ type: "USER_SIGNOUT" });
+  const mutation = useMutation({
+    mutationFn : logout ,
+    onSuccess: () => {},
+    onError: (error) => {
+      console.error("Error in logout mutation:", error);
+    }
+  })
+
+  const signoutHandler =async () => {
+    try {
+      await mutation.mutateAsync();
+        ctxDispatch({ type: "USER_SIGNOUT" });
     localStorage.removeItem("userInfo");
     localStorage.removeItem("shippingAddress");
     localStorage.removeItem("paymentMethod");
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+
+    }
+  
+    
   };
 
   return (
@@ -48,7 +66,7 @@ const Header = () => {
         <div className="nav-links">
           <Link to="/">Home</Link>
           <Link to="/orders">Orders</Link>
-          <Link to="/track-order">Track Order</Link>
+         
           <Link to="/customer-support">Customer Support</Link>
           <Link to="/need-help">Need Help</Link>
         </div>
@@ -80,7 +98,7 @@ const Header = () => {
               <div onClick={handleButtonClick} className="user">
                 <img
                   className="avatar"
-                  src={"/" + userInfo.profilePicture}
+                  src={"/"+ userInfo?.profilePicture}
                   alt="user"
                 />
                 <p className="user-name">{userInfo.name}</p>
@@ -88,48 +106,44 @@ const Header = () => {
 
               {dropdownOpen && (
                 <ul className="category-list">
-                <Link to="#" style={{textDecoration : "none"}}>
+                <Link to={userInfo.isAdmin ? "/admindash" : userInfo.isSeller ? "/sellerdash" : "userdash"} style={{textDecoration : "none"}}>
                   <li className="category-item user-item">
                     <span>
                       <img src="/images/dashboard.svg" alt="dashboard" />
                     </span>
                     Dashboard
                   </li></Link>
-                  {userInfo.isSeller && (
-                    <Link to="#" style={{textDecoration : "none"}}>
+                  
+                  {((userInfo.isAdmin|| userInfo.isSeller )||(userInfo.isSeller && userInfo.isAdmin))&& (
+                    <Link to="/productlist" style={{textDecoration : "none"}}>
                     <li className="category-item user-item">
                       <span>
                         <img src="/images/product.svg" alt="product" />
                       </span>
                       Products
                     </li></Link>
-                  )}
+              )}
                   {userInfo.isAdmin && (
                     <>
                     <Link to="#" style={{textDecoration : "none"}}>
-                      <li className="category-item user-item">
-                        <span>
-                          <img src="/images/storeOrder.svg" alt="order" />
-                        </span>
-                        Order History
-                      </li>
+                     
                       <li className="category-item user-item">
                         <span>
                           <img src="/images/Messenger.svg" alt="messenger" />
                         </span>
                         Support chat
                       </li></Link>
-                      <Link to="#" style={{textDecoration : "none"}}>
+                      <Link to="/user" style={{textDecoration : "none"}}>
                       <li className="category-item user-item">
                         <span>
-                          <i class="fa fa-users" aria-hidden="true"></i>
+                          <i className="fa fa-users" aria-hidden="true"></i>
                         </span>
                         users
                       </li>
                       </Link>
                     </>
                   )}
-                  <Link to="#" style={{textDecoration : "none"}}>
+                  <Link to="/orderhistory" style={{textDecoration : "none"}}>
                   <li className="category-item user-item">
                     <span>
                       <img src="/images/storeOrder.svg" alt="order" />
@@ -137,7 +151,7 @@ const Header = () => {
                     Order History
                   </li>
                   </Link>
-                  <Link to="#" style={{textDecoration : "none"}}>
+                  <Link to="/track" style={{textDecoration : "none"}}>
                   <li className="category-item user-item">
                     <span>
                       <i className="fa fa-map-marker" aria-hidden="true"></i>
@@ -145,7 +159,7 @@ const Header = () => {
                     Track Order
                   </li>
                   </Link>
-                  <Link to="#" style={{textDecoration : "none"}}>
+                  <Link to="/cart" style={{textDecoration : "none"}}>
                   <li className="category-item user-item">
                     <span>
                       <i className="fa fa-shopping-cart" aria-hidden="true"></i>
@@ -153,7 +167,7 @@ const Header = () => {
                     Shopping Cart
                   </li>
                   </Link>
-                  <Link to="#" style={{textDecoration : "none"}}>
+                  <Link to="/history" style={{textDecoration : "none"}}>
                   <li className="category-item user-item">
                     <span>
                       <i className="fa fa-history" aria-hidden="true"></i>
@@ -161,7 +175,7 @@ const Header = () => {
                     Browsing History
                   </li>
                   </Link>
-                  <Link to="#" style={{textDecoration : "none"}}>
+                  <Link to="/profile" style={{textDecoration : "none"}}>
                   <li className="category-item user-item">
                     <span>
                       <i className="fa fa-cog" aria-hidden="true"></i>

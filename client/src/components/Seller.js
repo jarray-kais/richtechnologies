@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { sellerOrAdmin } from "../API";
 import { useNavigate } from "react-router-dom";
-import Loading from "./Loading";
+import Loading from "./Loading/LoadingOverlay";
 
 const Seller = ({children}) => {
   const navigate = useNavigate();

@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
         isSeller: { type: Boolean, default: false },
         seller: {
             nameBrand: {type : String},
-            Country : String ,
+            Address : String ,
             logo: String,
             description: String,
             rating: { type: Number, default: 0, required: true },
@@ -25,6 +25,6 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default User;

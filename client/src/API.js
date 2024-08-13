@@ -11,6 +11,7 @@ export const signIn = async (credentials) => {
       formData.append(key, userData[key]);
     });
     
+    
     const response = await axios.post('/api/users/signup', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -25,9 +26,15 @@ export const signIn = async (credentials) => {
     Object.keys(userData).forEach((key) => {
       formData.append(key, userData[key]);
     });
-    
+ 
    
   const response = await axios.post('/api/users/sellerSignup', formData)
+    return response.data;
+  }
+
+  //Route logout --------------------------------
+  export const logout = async()=>{
+    const response = await axios.post('/api/users/logout',{ withCredentials: true })
     return response.data;
   }
 
@@ -87,11 +94,6 @@ export const fetchbrand = async(category)=>{
   return response.data;
 }
 
-//Route edit Profile
-export const editProfile = async(user)=>{
-  const response = await axios.put('/api/users/profile',user)
-    return response.data
-}
 
 
 //Route get featured products --------------------------------
@@ -202,5 +204,214 @@ export const sendcashPayment = async(id)=>{
 export const cashPayment = async(id)=>{
   console.log(id)
   const response = await axios.get(`/api/orders/${id}/cashpay`)
+  return response.data;
+}
+//Route Total order --------------------------------
+
+export const totalOrder = async()=>{
+  const response = await axios.get(`/api/orders/totalOrders`)
+  return response.data;
+}
+
+//Route count complete order  --------------------------------
+
+export const Ordercomplete = async()=>{
+  const response = await axios.get(`/api/orders/completeOrder`)
+  return response.data;
+}
+
+//Route view Orders --------------------------------
+export const myOrder = async(page,limit)=>{
+  const response = await axios.get(`/api/orders/myOrder?page=${page}&limit=${limit}`)
+  return response.data;
+}
+
+
+//Route view product                                 --------------------------------
+export const viewProduct = async(id )=>{
+  const response = await axios.post(`/api/products/${id}/view`)
+  return response.data
+}
+
+
+
+//Route obtenir les informations de seller------------------------------------
+
+export const sellerinfo = async()=>{
+    const response = await axios.get(`/api/users/seller`)
+  return response.data
+}
+
+//route total product of seller--------------------------------
+
+export const totalProduct = async()=>{
+  const response = await axios.get(`/api/products/seller`)
+  return response.data
+}
+
+//route obtenir les orders de seller--------------------------------
+
+export const sellerOrder = async(page,limit)=>{
+  const response = await axios.get(`/api/orders/seller?page=${page}&limit=${limit}`)
+  return response.data
+}
+
+//Route Admin view all order----------------------------
+export const  orders = async(page , limit)=>{
+  const response = await axios.get(`/api/orders/AllOrder?page=${page}&limit=${limit}`)
+
+  return response.data
+}
+
+//Route delete order--------------------------------
+
+export const deleteOrder = async(id )=>{
+  console.log(id)
+  const response = await axios.delete(`/api/orders/${id}`)
+  return response.data
+}
+
+// routes for Order update by admin------------------
+export const updateOrder = async ({ id, updatedData }) => {
+  const response = await axios.put(`/api/orders/${id}`, updatedData);
+  return response.data;
+};
+
+//Route histoique ----------------------------------
+
+export const historique = async(page,limit)=>{
+  const response = await axios.get(`/api/products/history?page=${page}&limit=${limit}`)
+  return response.data
+}
+
+//Route Admin get all users------------------------------
+
+export const getUsers = async(page , limit)=>{
+  const response = await axios.get(`/api/users/?page=${page}&limit=${limit}`)
+  return response.data
+}
+//Route delete users-------------------------------------
+
+export const deleteUser = async(id )=>{
+  const response = await axios.delete(`/api/users/${id}`)
+  return response.data
+}
+
+//Route Admin update user--------------------------------
+
+export const updateUser = async ({ id, updatedData }) => {
+  const response = await axios.put(`/api/users/${id}`, updatedData);
+  return response.data;
+};
+//Route get user--------------------------------
+export const getUser = async(id) => {
+  const response = await axios.get(`/api/users/${id}`);
+  return response.data;
+}
+//Route user--------------------------------
+export const fetchUser = async() => {
+  const response = await axios.get(`/api/users/profile`);
+  return response.data;
+} 
+
+
+//Route admin get all products--------------------------------
+
+export const getProducts = async(page , limit)=>{
+  const response = await axios.get(`/api/products/All?page=${page}&limit=${limit}`)
+  return response.data
+}
+
+//seller delete Products--------------------------------
+
+export const deleteProduct = async(id )=>{
+  const response = await axios.delete(`/api/products/${id}`)
+  return response.data
+}
+
+//Route Update Products-------------------------------
+export const updateProduct = async ({ id, updatedData }) => {
+  const formData = new FormData();
+
+  // Append non-file fields
+  Object.keys(updatedData).forEach((key) => {
+    if (key !== 'image') { // Exclude 'image' field
+      formData.append(key, updatedData[key]);
+    }
+  });
+
+  // Append image files
+  if (updatedData.image && updatedData.image.length > 0) {
+    updatedData.image.forEach((file) => {
+      if (file instanceof File) {
+        formData.append('image', file); // Append each file
+      }
+    });
+  }
+
+  const response = await axios.put(`/api/products/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
+};
+
+//Route create a new product----------------------------------
+
+export const createProduct = async ({productData}) => {
+  const formData = new FormData();
+
+  // Append non-file fields
+  Object.keys(productData).forEach((key) => {
+    if (key!== 'image') {
+      formData.append(key, productData[key]);
+    }
+  });
+  console.log(formData)
+  console.log(productData)
+
+  // Append image files
+  if (productData.image && productData.image.length > 0) {
+    productData.image.forEach((file) => {
+      if (file instanceof File) {
+        formData.append('image', file); // Append each file
+      }
+    });
+  }
+
+  const response = await axios.post(`/api/products/new`, formData, {
+    headers: {
+      'Content-Type':'multipart/form-data',
+    },
+  });
+
+  return response.data;
+};
+
+//Route update profile----------------------------
+
+export const updateProfile = async (formData) => {
+  console.log(formData)
+  const response = await axios.put(`/api/users/profile`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+//Route of summary information-----------------
+
+export const fetchsummary = async() => {
+  const response = await axios.get(`/api/orders/summary`);
+  return response.data;
+};
+
+//Route canceled orders----------------------------
+export const canceledorder = async(id)=>{
+  console.log(id)
+  const response = await axios.post(`api/orders/${id}/cancel`)
   return response.data;
 }

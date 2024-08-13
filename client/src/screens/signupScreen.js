@@ -14,7 +14,7 @@ const SignupScreen = () => {
     password: "",
     confirmPassword: "",
     telephone: '',
-    country: '',
+    Country: '',
     profilePicture: null,
   })
   const mutation = useMutation({ mutationFn: signUp ,
@@ -114,11 +114,11 @@ const SignupScreen = () => {
         />
       </div>
       <div className="form-group">
-        <label>country:</label>
+        <label>Country:</label>
         <input
           type="text"
-          name="country"
-          value={formData.country}
+          name="Country"
+          value={formData.Country}
           onChange={handleChange}
           required
         />

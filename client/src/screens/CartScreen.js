@@ -2,27 +2,23 @@ import { useContext } from 'react';
 import Message from "../components/Message/Message";
 import { Link, useNavigate } from 'react-router-dom';
 import { Store } from '../Context/CartContext';
-import { findproduct } from '../API';
+import { findproduct, viewProduct } from '../API';
+import { useMutation } from '@tanstack/react-query';
 
 
 const CartScreen = () => {
     const navigate = useNavigate();
-  
-  
     const { state, dispatch: ctxDispatch } = useContext(Store);
     const {
       cart: { cartItems },
       userInfo
     } = state;
-
     const UpdateCartHandler = async (item, quantity) => {
       const { data: productdetail } = await findproduct(item._id);
-
       if (productdetail && productdetail.countInStock < quantity) {
         window.alert('Sorry. Product is out of stock');
         return;
       }
-      
       ctxDispatch({
         type: 'CART_ADD_ITEM',
         payload: { ...item, quantity },
@@ -49,7 +45,21 @@ const CartScreen = () => {
         
       };
 
-
+      const mutateView = useMutation({
+        mutationFn :(id)=> viewProduct(id),
+        onSuccess: (data) =>{
+          navigate(`/product/${data.product._id}`)
+        }
+      })
+      
+      const handleClick = (e , id) => {
+        if(userInfo){
+           e.preventDefault();
+        mutateView.mutate(id)
+        } else{
+          navigate(`/product/${id}`)
+        }
+      };
     return (
       <div className="cart-container">
         <div className="cart-left">
@@ -63,11 +73,15 @@ const CartScreen = () => {
               {cartItems.map((item) => (
                 <div key={item._id} className="cart-item">
                   <div className="cart-item-details">
-                  <Link to={`/product/${item._id}`} className="cart-item-name">
+                  <Link to={`/product/${item._id}`} className="cart-item-name" 
+                   onClick={(e) => handleClick(e, item._id)}
+                   >
                     <img src={item.image[0].url} alt={item.name} className="cart-item-image" />
                     </Link>
                     <div className="cart-item-info">
-                      <Link to={`/product/${item._id}`} className="cart-item-name">
+                      <Link to={`/product/${item._id}`} className="cart-item-name"
+                       onClick={(e) => handleClick(e, item._id)}
+                       >
                         {item.name}
                       </Link>
                       <div className="cart-item-price">${item.price}</div>

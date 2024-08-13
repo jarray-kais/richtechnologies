@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { admin } from "../API";
 import { useQuery } from "@tanstack/react-query";
-import Loading from "../components/LoadingOverlay";
+import Loading from "../components/Loading/LoadingOverlay";
 import { useNavigate } from "react-router-dom";
 
 const Admin = ({ children }) => {
@@ -32,7 +32,7 @@ const Admin = ({ children }) => {
   if (unauthorizedMessage) {
     return <div>{unauthorizedMessage}</div>;
   }
-  console.log(children);
+
 
   return checkadmin && (checkadmin.authenticated || checkadmin.authorized)
     ? children

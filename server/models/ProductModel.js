@@ -78,12 +78,15 @@ const productSchema = new mongoose.Schema(
           main: doc.category.main,
           sub: doc.category.sub
         },
-        rating : doc.rating,
+        rating: doc.rating,
         brand: doc.brand,
         price: doc.price,
         countInStock: doc.countInStock,
         rating: doc.rating,
-        promotion: doc.promotion
+        promotion: doc.promotion ? {
+          discountedPrice: doc.promotion.discountedPrice,
+        } : undefined,
+       
       };
       await client.index({
         index: 'ecommerce',
@@ -144,6 +147,7 @@ export default Product;
     },
     {
       name: doc.name,
+      
       description: doc.description,
       category: {
         main: doc.category.main,
@@ -182,4 +186,107 @@ export default Product;
   }
   
   }
+
+  async function checkIndexExists(indexName) {
+    try {
+      const { body } = await client.indices.exists({ index: indexName });
+      return body; // true if index exists, false otherwise
+    } catch (error) {
+      console.error('Error checking index existence:', error);
+      return false;
+    }
+  }
+
+  async function createNewIndex() {
+    try {
+      const indexExists = await checkIndexExists('ecommerce_suggest');
+    if (indexExists) {
+      console.log('Index "ecommerce_suggest" already exists.');
+      return; // Exit if the index already exists
+    }
+      const response = await client.indices.create({
+        index: 'ecommerce_suggest',
+        body: {
+          mappings: {
+            properties: {
+              name: {
+                type: 'text',
+                fields: {
+                  suggest: {
+                    type: 'completion',
+                  },
+                },
+              },
+              description: {
+                type: 'text',
+                fields: {
+                  suggest: {
+                    type: 'completion',
+                  },
+                },
+              },
+              category: {
+                properties: {
+                  main: {
+                    type: 'text',
+                    fields: {
+                      suggest: {
+                        type: 'completion',
+                      },
+                    },
+                  },
+                  sub: {
+                    type: 'text',
+                    fields: {
+                      suggest: {
+                        type: 'completion',
+                      },
+                    },
+                  },
+                },
+              },
+              brand: {
+                type: 'text',
+                fields: {
+                  suggest: {
+                    type: 'completion',
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+  
+      console.log('New index created successfully:', response);
+    } catch (error) {
+      console.error('Error creating new index:', error);
+    }
+  }
+  
+async function reindexData() {
+  try {
+    await client.reindex({
+      body: {
+        source: {
+          index: 'ecommerce',
+        },
+        dest: {
+          index: 'ecommerce_suggest',
+        },
+      },
+    });
+
+    console.log('Data reindexed successfully');
+  } catch (error) {
+    console.error('Error reindexing data:', error);
+  }
+}
+async function updateMappingsAndReindex() {
+  await createNewIndex();
+  await reindexData();
+
+}
+
+/* updateMappingsAndReindex(); */
   syncData();

@@ -8,26 +8,6 @@ import nodemailer from 'nodemailer';
 
 const orderRouter =express.Router()
 
-orderRouter.get(
-  '/',
-  isAuth,
-  isSellerOrAdmin,
-  expressAsyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 6;
-    const startIndex = (page - 1) * limit;
-    const seller = req.query.seller || '';
-    const sellerFilter = seller ? { seller } : {};
-
-    const orders = await Order.find({ ...sellerFilter }).populate(
-      'user',
-      'name'
-    ).skip(startIndex)
-    .limit(limit);;
-    res.send(orders);
-  })
-);
-
 //Fetches summary data for orders, users, and products.
 orderRouter.get(
   '/summary',
@@ -102,15 +82,16 @@ orderRouter.get(
 
 // Route for users to view their own orders
 orderRouter.get(
-  '/my',
+  '/myOrder',
   isAuth,
   expressAsyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 6;
     const startIndex = (page - 1) * limit;
+    const totalCount = await Order.countDocuments({user: req.user._id });
     const orders = await Order.find({ user: req.user._id }).skip(startIndex)
      .limit(limit);
-    res.send(orders);
+    res.send({orders , totalCount});
   })
 );
 // Route Admin to view all orders
@@ -122,26 +103,108 @@ orderRouter.get(
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 6;
     const startIndex = (page - 1) * limit;
+    const totalCount = await Order.countDocuments({});
+    const completeOrder = await Order.countDocuments({isDelivered: true})
+    const canceledOrder = await Order.countDocuments({isCanceled: true})
     const orders = await Order.find({}).skip(startIndex)
      .limit(limit);
-    res.send(orders);
+     res.send({
+      orders,
+      totalCount,
+      completeOrder,
+      canceledOrder
+    });
   })
 );
 
+//Route Seller to view and count all orders
+orderRouter.get(
+  '/seller',
+  isAuth,
+  isSellerOrAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const sellerId = req.user._id;  
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const startIndex = (page - 1) * limit;
+   // Agrégation pour obtenir les commandes distinctes et le total des commandes
+   const [orders, totalOrdersResult , totalDeliveredOrdersResult ] = await Promise.all([
+    Order.aggregate([
+    // Décompose les documents de commande en documents séparés pour chaque orderItem
+    { $unwind: "$orderItems" },
+    
+    // Filtre pour ne garder que les commandes contenant des articles du vendeur spécifié
+    { $match: { "orderItems.seller": sellerId } },
+    
+    // Regroupe les documents par l'ID de la commande
+    {
+      $group: {
+        _id: "$_id", // Regroupe par ID de la commande
+        order: { $first: "$$ROOT" }, // Conserve le premier document complet de la commande
+        itemsCount: { $sum: 1 }, // Compte le nombre d'articles dans la commande
+        orderItems: { $push: "$orderItems" } // Rassemble tous les orderItems dans un tableau
+      }
+    },
+    // Pagination
+    { $skip: startIndex },
+    { $limit: limit },
+    {
+      $project: {
+        _id: 1,
+        order: 1,
+        itemsCount: 1,
+        orderItems: 1 
+      }
+    }
+  ]),
+
+  Order.aggregate([
+    { $match: { "orderItems.seller": sellerId } },
+    {
+      $group: {
+        _id: null,
+        totalOrders: { $sum: 1 }
+      }
+    }
+  ]),
+
+   Order.aggregate([
+    { $match: { "orderItems.seller": sellerId, isDelivered: true } },
+    {
+      $group: {
+        _id: null,
+        totalDeliveredOrders: { $sum: 1 }
+      }
+    }
+  ])
+  ]);
+
+  const totalOrders = totalOrdersResult[0]?.totalOrders || 0;
+      const totalDeliveredOrders = totalDeliveredOrdersResult[0]?.totalDeliveredOrders || 0;
+
+
+  res.json({  totalDeliveredOrdersResult ,totalOrdersResult, orders });
+  })
+);
+
+
+
 // Route to fetch total orders for user
 orderRouter.get('/totalOrders', isAuth, expressAsyncHandler(async (req, res) => {
+  
     const userId = req.user._id;
     const totalOrders = await Order.countDocuments({ user: userId });
     res.json({ totalOrders });
  
 })
-);
+); 
 
 //Route to fetch complete order 
 orderRouter.get('/completeOrder' , isAuth , expressAsyncHandler(async(req , res)=>{
   const userId = req.user._id;
   const completeOrder = await Order.countDocuments({user : userId , isDelivered : true })
-  res.send(completeOrder)
+ 
+  res.json(completeOrder)
 }))
 
 
@@ -160,10 +223,13 @@ orderRouter.post(
         res.status(400).send({ message: 'Veuillez fournir une adresse de livraison valide' });
         return;
       }
-      const sellers = new Set(req.body.orderItems.map(item => item.seller));
-      if (sellers.size > 1) {
-        res.status(400).send({ message: 'Un vendeur ne peut pas acheter un produit d\'autre vendeur' });
-        return;
+      if (req.user.isSeller) {
+        const userSellerId = req.user._id.toString();
+        const isBuyingFromAnotherSeller = req.body.orderItems.some(item => item.seller.toString() !== userSellerId);
+        if (isBuyingFromAnotherSeller) {
+          res.status(400).send({ message: 'Un vendeur ne peut pas acheter un produit d\'autre vendeur' });
+          return;
+        }
       }
       // Créer une nouvelle commande
       const order = new Order({
@@ -286,14 +352,35 @@ console.log('Email envoyé: ' + info.response);
   }
 }));
 
+//route canceled order--------------------------------
 
+orderRouter.post('/:id/cancel' , isAuth , expressAsyncHandler(async (req, res)=> {
+  const order = await Order.findById(req.params.id);
+  if (order) {
+    if (order.user.toString() === req.user._id.toString()) {
+      order.isCanceled = true;
+      const updatedOrder = await order.save();
+      res.send({ message: 'Order canceled', order: updatedOrder });
+    } else {
+      res.status(403).send({ message: 'You do not have permission to cancel this order' });
+    }
+  }else {
+    res.status(404).send({ message: 'Order Not Found' });
+  }
+}));
 // routes for Order update by admin
 orderRouter.put('/:id' , isAuth , isAdmin , expressAsyncHandler(async(req, res)=>{
   const order = await Order.findById(req.params.id);
   if (order) {
     order.isDelivered = req.body.isDelivered || order.isDelivered;
-    order.packaging = req.body.packaging;
-    order.onTheRoadBeforeDelivering = req.body.onTheRoadBeforeDelivering;
+    order.packaging = req.body.packaging|| order.packaging;
+    order.onTheRoadBeforeDelivering = req.body.onTheRoadBeforeDelivering|| order.onTheRoadBeforeDelivering;
+    order.isPaid = req.body.isPaid || order.isPaid
+    if (req.body.isPaid && !order.isPaid) {
+      order.paidAt = Date.now();
+    }
+    console.log( req.body.isDelivered);
+    console.log( req.body.packaging);
     const updatedOrder = await order.save();
     res.send({ message: 'Order status updated', order: updatedOrder });
   } else {
@@ -332,7 +419,7 @@ orderRouter.put('/:orderId/shipping', isAuth , expressAsyncHandler(async(req , r
 orderRouter.delete(
   '/:id',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id);
     if (order) {

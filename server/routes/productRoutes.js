@@ -252,7 +252,6 @@ productRouter.get(
 // Route to handle suggestions
 productRouter.get('/suggest', expressAsyncHandler(async (req, res) => {
   let { query } = req.query;
-  console.log('Query:', query);
 
   if (typeof query !== 'string') {
     return res.status(400).send({ message: 'Query parameter must be a string' });
@@ -261,7 +260,6 @@ productRouter.get('/suggest', expressAsyncHandler(async (req, res) => {
 
   query = query.toLowerCase();
   const mappings = await client.indices.getMapping({ index: 'ecommerce_suggest' });
-console.log('Index Mappings:', mappings);
 
 
     // Search Elasticsearch
@@ -304,7 +302,7 @@ console.log('Index Mappings:', mappings);
     });
 
     // Log the entire result object
-    console.log('Elasticsearch Result:', result.suggest);
+
 
     // Log the suggest section
     const suggestSection = result.suggest || {};
@@ -325,12 +323,6 @@ console.log('Index Mappings:', mappings);
     res.json(suggestions);
   
 }));
-
-
-
-
-
-
 
 //route find deal products
 productRouter.get(
@@ -470,7 +462,6 @@ productRouter.get(
     const productId = req.params.id;
    
     const product = await Product.findById(productId);
-    console.log(product);
     if (product) {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 8;
@@ -646,7 +637,7 @@ productRouter.post(
     const productId = req.params.id;
     const userId = req.user._id;
     const product = await Product.findById(productId);
-    // console.log(userId)
+  
     if (!product) {
       res.status(404).send({ message: "Product Not Found" });
     } else {
@@ -685,6 +676,7 @@ productRouter.put(
     product.brand = req.body.brand || product.brand;
     product.countInStock = req.body.countInStock || product.countInStock;
     product.description = req.body.description || product.description;
+    
     if (req.files && req.files.length > 0) {
       // Supprimez les anciennes images
       if (product.images && product.images.length > 0) {
@@ -709,40 +701,13 @@ productRouter.put(
   })
 );
 
-//delete product
-productRouter.delete(
-  "/:id/product",
-  isAuth,
-  isAdmin,
-  expressAsyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      if (product.image && product.image.length > 0) {
-        product.image.forEach((image) => {
-          fs.unlink(image.url, (err) => {
-            if (err) {
-              console.error(`Error deleting ${image.url}:`, err);
-            } else {
-              console.log(`Successfully deleted ${image.url}`);
-            }
-          });
-        });
-      }
-
-      const deleteProduct = await product.deleteOne();
-      res.send({ message: "Product Deleted", product: deleteProduct });
-    } else {
-      res.status(404).send({ message: "Product Not Found" });
-    }
-  })
-);
-//seller or admin delete her product
 productRouter.delete(
   "/:id",
   isAuth,
   isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
+
     if (product) {
       // Check if the user is the owner of the product or an admin
       if (req.user.isAdmin || product.seller.toString() === req.user._id.toString()) {
@@ -769,5 +734,6 @@ productRouter.delete(
     }
   })
 );
+
 
 export default productRouter;

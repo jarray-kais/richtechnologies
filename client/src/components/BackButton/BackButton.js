@@ -10,7 +10,7 @@ const BackButton = () => {
 
   return (
     <button onClick={handleBackClick} className="back-button">
-      <img src='images/back.svg' alt='vector' className="back-icon"/>
+      <img src='/images/back.svg' alt='vector' className="back-icon"/>
     </button>
   );
 };

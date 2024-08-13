@@ -17,6 +17,8 @@ const ProductdetailsScreen = () => {
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
   const [review, setReview] = useState({ comment: "", rating: 0 });
+
+  
   const {
     data: productdetail,
     isLoading: loadingproductdetails,
@@ -48,6 +50,9 @@ const ProductdetailsScreen = () => {
       setMessage(errorMessage);
     },
   });
+
+
+   
 
   const handleSubmit = useCallback(
     (e) => {
@@ -208,7 +213,8 @@ const ProductdetailsScreen = () => {
                   </div>
                 </div>
               ))}
-              <form onSubmit={handleSubmit}>
+              { userInfo ? (
+                    <form onSubmit={handleSubmit}>
                 <div className="review-form">
                   <div className="form-grouppp">
                     <div>
@@ -259,6 +265,10 @@ const ProductdetailsScreen = () => {
                 </div>
                 {message && <p className="error-message">{message}</p>}
               </form>
+              ):<p><Link to={"/signin"}>signin</Link> to post Review </p>
+
+              }
+              
             </div>
           </div>
           { similarLoading ? (<Loading />) : similarError ?(<Message variant="danger">{similarError.message}</Message>) :(

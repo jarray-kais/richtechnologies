@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Store } from "../Context/CartContext";
 import CheckoutSteps from "../components/Chekout/CheckoutSteps";
 import { Link, useNavigate } from "react-router-dom";
-import { findproduct, placeOrder } from "../API";
+import { findproduct, placeOrder, viewProduct } from "../API";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "../components/Loading/LoadingOverlay";
 import Message from "../components/Message/Message";
@@ -13,7 +13,7 @@ const PlaceOrderScreen = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { state, dispatch: ctxDispatch } = useContext(Store);
-  const { cart } = state;
+  const { cart , userInfo } = state;
 
   const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100; // 123.2345 => 123.23
   cart.itemsPrice = round2(
@@ -68,6 +68,7 @@ const PlaceOrderScreen = () => {
       price: item.price,
       product: item._id,
       qty: item.quantity,
+      seller :item.seller,
     })),
     shippingAddress: cart.shippingAddress,
     paymentMethod: cart.paymentMethod,
@@ -76,7 +77,8 @@ const PlaceOrderScreen = () => {
     taxPrice: cart.taxPrice,
     totalPrice: cart.totalPrice,
   };
-  console.log("Order Data:", orders);
+
+  console.log(orders.orderItems.seller)
 
   const placeOrderHandler = () => {
     setIsLoading(true);
@@ -89,6 +91,22 @@ const PlaceOrderScreen = () => {
       navigate("/payment");
     }
   }, [cart, navigate]);
+
+  const mutateView = useMutation({
+    mutationFn :(id)=> viewProduct(id),
+    onSuccess: (data) =>{
+      navigate(`/product/${data.product._id}`)
+    }
+  })
+  
+  const handleClick = (e , id) => {
+    if(userInfo){
+       e.preventDefault();
+    mutateView.mutate(id)
+    } else{
+      navigate(`/product/${id}`)
+    }
+  };
   return (
     <div>
       <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
@@ -114,7 +132,9 @@ const PlaceOrderScreen = () => {
             {cart.cartItems.map((item, index) => (
               <div key={index} className="order-item">
                 <div className="item-info">
-                  <Link to={`/product/${item._id}`}>
+                  <Link to={`/product/${item._id}`}
+                  onClick={(e) => handleClick(e, item._id)}
+                  >
                     <img
                       src={item.image[0].url}
                       alt={item.name}
