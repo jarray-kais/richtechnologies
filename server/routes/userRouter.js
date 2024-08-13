@@ -112,11 +112,10 @@ userRouter.post('/sellerSignup' ,
 upload.fields([{ name: 'profilePicture'}, { name: 'logo' }]),
 resizeImages ,
  expressAsyncHandler(async (req, res) => {
-  const { name, email, password , telephone , sellerName , sellerAdresse, description , Country } = req.body;
+  const { name, email, password , telephone , nameBrand , Address, description , Country } = req.body
   const profilePicture = req.files['profilePicture'][0].path // Chemin de l'image téléchargée
   const logo = req.files['logo'][0].path 
   // Check if the user already exists
-
   const existingUser = await User.findOne({ $or: [
     { email },
     { name: req.body.name }, 
@@ -137,8 +136,8 @@ resizeImages ,
       isAdmin: false,
       isSeller: true,
       seller: {
-        nameBrand: sellerName,
-        adresse: sellerAdresse, 
+        nameBrand,
+        Address, 
         logo ,
         description,
         rating: 0 ,
@@ -175,6 +174,7 @@ userRouter.post('/signin', expressAsyncHandler(async (req, res) => {
             email: user.email,
             profilePicture : user.profilePicture,
             telephone : user.telephone ,
+            Country: user.Country,
             isAdmin: user.isAdmin,
             isSeller: user.isSeller,
             token: token
@@ -183,6 +183,12 @@ userRouter.post('/signin', expressAsyncHandler(async (req, res) => {
         res.status(401).json({ message: 'Invalid email or password' });
     }
 }));
+
+// Logout
+userRouter.post('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.send({ message: 'User logged out' });
+});
 
 //forgot Password
 userRouter.post(
@@ -230,7 +236,6 @@ userRouter.post(
 
   })
 )
-
 //reset password
 userRouter.post(
   '/reset-password',
@@ -271,28 +276,79 @@ resizeImages ,
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
-      user.profilePicture = req.body.profilePicture || user.profilePicture ;
-      user.telephone = req.body.telephone || user.telephone ;
+      user.telephone = req.body.telephone || user.telephone;
+      user.Country = req.body.Country || user.Country;
+
+      if (user.profilePicture && req.files.profilePicture) {
+        if (fs.existsSync(user.profilePicture)) {
+          fs.unlink(user.profilePicture, (err) => {
+            if (err) {
+              console.error("Error deleting the old profile picture:", err);
+            } else {
+              console.log("Old profile picture deleted successfully");
+            }
+          });
+        } else {
+          console.log("Old profile picture not found, skipping deletion.");
+        }
+        user.profilePicture = req.files.profilePicture[0].path;
+      }
+      
+      if (user.seller.logo && req.files.logo) {
+        if (fs.existsSync(user.seller.logo)) {
+          fs.unlink(user.seller.logo, (err) => {
+            if (err) {
+              console.error("Error deleting the old logo:", err);
+            } else {
+              console.log("Old logo deleted successfully");
+            }
+          });
+
+          
+        } else {
+          console.log("Old logo not found, skipping deletion.");
+        }
+        user.seller.logo = req.files.logo[0].path;
+      }
+
       if (user.isSeller) {
-        user.seller.nameBrand = req.body.sellerName || user.seller.nameBrand;
-        user.seller.logo = req.body.sellerLogo
-        user.seller.description = req.body.sellerDescription || user.seller.description;
+        user.seller.nameBrand = req.body.nameBrand || user.seller.nameBrand;
+        user.seller.description = req.body.description || user.seller.description;
+        user.seller.Address = req.body.Address || user.seller.Address;
+        
       }
       if (req.body.password) {
         user.password = bcrypt.hashSync(req.body.password, 8);
       }
+      if(req.body.email) {
+        const user = await User.findOne({ email: req.body.email  })
+        if(user){
+         return  res.status(500).send({ message: 'Email already exists' });
+        }
+
+      
+      
+      
       const updatedUser = await user.save();
-      res.send({
+      const responsePayload = {
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
-        profilePicture : updatedUser.profilePicture,
-        telephone :updatedUser.telephone,
-        isAdmin: user.isAdmin,
-        isSeller: user.isSeller,
+        profilePicture: updatedUser.profilePicture,
+        telephone: updatedUser.telephone,
+        Country: updatedUser.Country,
+        isAdmin: updatedUser.isAdmin,
+        isSeller: updatedUser.isSeller,
         token: generateToken(updatedUser),
-      });
-
+      };
+      if (updatedUser.isSeller) {
+        responsePayload.nameBrand = updatedUser.seller.nameBrand;
+        responsePayload.description = updatedUser.seller.description;
+        responsePayload.Address = updatedUser.seller.Address;
+      }
+      }
+      
+      res.send(responsePayload);
     }
   })
 );
@@ -317,8 +373,6 @@ userRouter.put(
     }
   })
 );
-
-
 // delete users
 userRouter.delete(
   '/:id',
